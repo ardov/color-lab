@@ -1,0 +1,97 @@
+.root {
+  --bg: var(--c-acc-btn-normal);
+
+  // Size
+  padding: 2px 16px;
+  min-height: 32px;
+
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--r-m);
+  background-color: transparent;
+  border: none;
+  transition: 100ms ease-in-out;
+  user-select: none;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    border-radius: var(--r-m);
+    transition: 100ms ease;
+  }
+
+  &:active::before {
+    transform: scale(1.06);
+    transition: 200ms cubic-bezier(0.3, 2.5, 0.5, 0.7);
+  }
+}
+
+.primary {
+  color: var(--c-acc-btn-text);
+
+  &::before {
+    background: var(--bg);
+  }
+
+  &:hover {
+    --bg: var(--c-acc-btn-hover);
+  }
+
+  &:active {
+    --bg: var(--c-acc-btn-active);
+  }
+}
+
+.secondary {
+  color: var(--bg);
+
+  &::before {
+    opacity: 0.5;
+    border: 1px solid var(--bg);
+  }
+
+  &:hover {
+    --bg: var(--c-acc-btn-hover);
+  }
+  &:hover::before {
+    opacity: 1;
+    background-color: var(--c-acc-surface-hover);
+  }
+
+  &:active {
+    --bg: var(--c-acc-btn-active);
+  }
+}
+
+.tetriary {
+  color: var(--bg);
+
+  &::before {
+    opacity: 0;
+    // border: 1px solid var(--bg);
+    background-color: var(--c-acc-surface-hover);
+    transform: scale(0.8);
+  }
+
+  &:hover {
+    --bg: var(--c-acc-btn-hover);
+  }
+  &:hover::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+  &:active::before {
+    transform: scale(1.06);
+  }
+
+  &:active {
+    --bg: var(--c-acc-btn-active);
+  }
+}

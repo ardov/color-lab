@@ -1,5 +1,5 @@
-import { clampChroma, Oklch } from 'culori'
-import { findTextTone } from './colors'
+import { Oklch } from 'culori'
+import { clampChroma, findTextTone } from './colors'
 
 type TLRule =
   | number
@@ -18,10 +18,7 @@ export function resolveRow(hue: number, chroma: number, row: TLRule[]) {
     } else if (rule.type === 'contrast') {
       if (rule.index >= i) throw new Error('link to future')
       const resultingColor = findTextTone(
-        clampChroma(
-          { mode: 'oklch', l: lRow[rule.index], c: chroma, h: hue },
-          'oklch'
-        ),
+        clampChroma({ mode: 'oklch', l: lRow[rule.index], c: chroma, h: hue }),
         rule.value
       )
       lRow.push(resultingColor.l)
@@ -29,9 +26,6 @@ export function resolveRow(hue: number, chroma: number, row: TLRule[]) {
   })
 
   return lRow.map(l => {
-    return clampChroma(
-      { mode: 'oklch', l, c: chroma, h: hue } as Oklch,
-      'oklch'
-    )
+    return clampChroma({ mode: 'oklch', l, c: chroma, h: hue } as Oklch)
   })
 }

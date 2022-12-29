@@ -1,0 +1,16 @@
+.root {
+  --gap: 1;
+  --spacing: 8px;
+
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * var(--gap));
+  padding: calc(var(--spacing) * var(--pt)) calc(var(--spacing) * var(--pr))
+    calc(var(--spacing) * var(--pb)) calc(var(--spacing) * var(--pl));
+  margin: calc(var(--spacing) * var(--mt)) calc(var(--spacing) * var(--mr))
+    calc(var(--spacing) * var(--mb)) calc(var(--spacing) * var(--ml));
+}
+
+.horizontal {
+  flex-direction: row;
+}

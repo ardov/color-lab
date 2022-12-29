@@ -1,5 +1,4 @@
 import {
-  clampChroma,
   clampRgb,
   Color,
   Oklch,
@@ -7,6 +6,7 @@ import {
   parse,
   rgb,
   Rgb,
+  displayable,
 } from 'culori'
 import { APCAcontrast, sRGBtoY } from 'apca-w3'
 import { findLowest, findHighest } from './binary-search'
@@ -67,6 +67,13 @@ export function calcAPCA(bg: Color | string, txt: Color | string): number {
   }
 }
 
+export function clampChroma(color: Oklch) {
+  if (displayable(color)) return color
+  const check = (c: number) => displayable({ ...color, c })
+  let c = findHighest(check, [0, 0.5])
+  return { ...color, c } as Oklch
+}
+
 export function getContrastText(
   bg: Color | string,
   colors: (Color | string)[] = ['#fff', '#000']
@@ -84,32 +91,68 @@ export function getContrastText(
   return txt
 }
 
-export function adjustL(bg: Color | string, change: number) {
-  const c = typeof bg === 'string' ? oklch(parse(bg)) : oklch(bg)
-  if (!c) throw new Error('Unknown color')
-  c.l += change
-  return clampChroma(c, 'oklch')
+export function adjustL(
+  bg: Color | string,
+  change: number,
+  targetChroma?: number
+) {
+  const color = typeof bg === 'string' ? oklch(parse(bg)) : oklch(bg)
+  if (!color) throw new Error('Unknown color')
+  return clampChroma({
+    ...color,
+    l: color.l + change,
+    c: targetChroma !== undefined ? targetChroma : color.c,
+  })
+}
+
+export function adjustContrast(
+  bg: Color | string,
+  text: Color | string,
+  targetLc: number
+) {
+  const txtColor = typeof text === 'string' ? oklch(parse(text)) : oklch(text)
+  const bgColor = typeof bg === 'string' ? oklch(parse(bg)) : oklch(bg)
+  if (!bgColor || !txtColor) throw new Error('Unknown color')
+
+  const lcWhite = calcAPCA(bgColor, '#fff')
+  const lcBlack = calcAPCA(bgColor, '#000')
+
+  const checker = (l: number) => {
+    const toCheck = clampChroma({ ...txtColor, l })
+    return calcAPCA(bgColor, toCheck) >= targetLc
+  }
+
+  if (lcWhite > lcBlack) {
+    // going up
+    if (lcWhite < targetLc) return { ...bgColor, l: 1 } as Oklch
+    let l = findLowest(checker, [bgColor.l, 1])
+    return clampChroma({ ...txtColor, l })
+  } else {
+    if (lcBlack < targetLc) return { ...bgColor, l: 0 } as Oklch
+    let l = findHighest(checker, [0, bgColor.l])
+    return clampChroma({ ...txtColor, l })
+  }
 }
 
 export function findTextTone(bg: Color | string, targetLc: number, c?: number) {
   const color = typeof bg === 'string' ? oklch(parse(bg)) : oklch(bg)
   if (!color) throw new Error('Unknown color')
-  const lcWhite = calcAPCA(color, '#fff')
-  const lcBlack = calcAPCA(color, '#000')
+  const lcToWhite = calcAPCA(color, '#fff')
+  const lcToBlack = calcAPCA(color, '#000')
 
   const checker = (l: number) => {
-    const toCheck = clampChroma({ ...color, l, c: c || color.c }, 'oklch')
+    const toCheck = clampChroma({ ...color, l, c: c || color.c })
     return calcAPCA(color, toCheck) >= targetLc
   }
 
-  if (lcWhite > lcBlack) {
+  if (lcToWhite > lcToBlack) {
     // going up
-    if (lcWhite < targetLc) return { ...color, l: 1 } as Oklch
+    if (lcToWhite < targetLc) return { ...color, l: 1 } as Oklch
     let l = findLowest(checker, [color.l, 1])
-    return clampChroma({ ...color, l }, 'oklch')
+    return clampChroma({ ...color, l })
   } else {
-    if (lcBlack < targetLc) return { ...color, l: 0 } as Oklch
+    if (lcToBlack < targetLc) return { ...color, l: 0 } as Oklch
     let l = findHighest(checker, [0, color.l])
-    return clampChroma({ ...color, l, c: c || color.c }, 'oklch')
+    return clampChroma({ ...color, l, c: c || color.c })
   }
 }

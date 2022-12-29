@@ -5,6 +5,7 @@
     "paths": {
       "@/*": ["*"]
     },
+    "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,

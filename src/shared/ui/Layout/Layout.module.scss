@@ -1,0 +1,19 @@
+.main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.leftPanel {
+  width: 320px;
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--c-main-base);
+  border-right: 1px solid var(--c-main-divider);
+}
+
+.mainPanel {
+  flex-grow: 1;
+  background-color: var(--c-main-surface-normal);
+}

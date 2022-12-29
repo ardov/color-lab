@@ -1,5 +1,4 @@
 /** Finds lowest number that returns true */
-
 export function findLowest(
   checker: (n: number) => boolean,
   range: [number, number] = [0, 1],
@@ -17,8 +16,8 @@ export function findLowest(
   }
   return end
 }
-/** Finds highest number that returns true */
 
+/** Finds highest number that returns true */
 export function findHighest(
   checker: (n: number) => boolean,
   range: [number, number] = [0, 1],
