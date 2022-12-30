@@ -4,6 +4,13 @@
   display: flex;
 }
 
+.panels {
+  display: flex;
+  flex-grow: 1;
+  height: 100%;
+  overflow-y: auto;
+}
+
 .leftPanel {
   width: 320px;
   flex-shrink: 0;
@@ -15,5 +22,5 @@
 
 .mainPanel {
   flex-grow: 1;
-  background-color: var(--c-main-surface-normal);
+  // background-color: var(--c-main-surface-normal);
 }

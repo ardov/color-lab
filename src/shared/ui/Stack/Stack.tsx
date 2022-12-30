@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { forwardRef, ReactNode } from 'react'
 import { clsx } from 'clsx'
 import classes from './Stack.module.scss'
 
@@ -23,7 +23,7 @@ export type StackProps = React.HTMLAttributes<HTMLDivElement> & {
   ml?: number
 }
 
-export const Stack: FC<StackProps> = props => {
+export const Stack = forwardRef<HTMLDivElement, StackProps>((props, ref) => {
   const {
     axis,
     gap,
@@ -67,9 +67,10 @@ export const Stack: FC<StackProps> = props => {
         { [classes.horizontal]: axis === 'x' },
         className
       )}
+      ref={ref}
       {...delegated}
     >
       {children}
     </div>
   )
-}
+})

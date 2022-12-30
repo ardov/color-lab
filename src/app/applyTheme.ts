@@ -1,9 +1,11 @@
+import { TTheme } from '@/shared/lib/theme'
 import { entries } from '@/shared/types'
 
-export function applyTheme(node: HTMLElement, theme: Object) {
+export function applyTheme(node: HTMLElement, theme: TTheme) {
   entries(flattenTheme(theme)).forEach(([key, val]) => {
     node.style.setProperty('--' + key, val)
   })
+  node.style.color = theme.c.main['text-primary']
 }
 
 export function flattenTheme(theme: Object) {

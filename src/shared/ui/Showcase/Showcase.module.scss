@@ -1,0 +1,38 @@
+.card {
+  border-radius: var(--r-l);
+  background-color: var(--c-main-base);
+  border: 1px solid var(--c-main-divider);
+  box-shadow: var(--shadow-elevation1);
+}
+
+.list {
+  border-radius: var(--r-l);
+  background-color: var(--c-main-base);
+  border: 1px solid var(--c-main-divider);
+
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+  box-shadow: var(--shadow-elevation2);
+}
+.listItem {
+  border-radius: var(--r-m);
+  background-color: var(--c-main-base);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 12px;
+  transition: 200ms ease-out;
+
+  &:hover {
+    background-color: var(--c-acc-surface-hover);
+  }
+
+  &.selected {
+    background-color: var(--c-acc-surface-active);
+    color: var(--c-acc-text-primary);
+  }
+}

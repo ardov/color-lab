@@ -28,7 +28,7 @@
   }
 
   &:active::before {
-    transform: scale(1.06);
+    transform: scale(0.96);
     transition: 200ms cubic-bezier(0.3, 2.5, 0.5, 0.7);
   }
 }
@@ -38,10 +38,14 @@
 
   &::before {
     background: var(--bg);
+    box-shadow: var(--shadow-elevation2);
   }
 
   &:hover {
     --bg: var(--c-acc-btn-hover);
+  }
+  &:active::before {
+    box-shadow: var(--shadow-elevation1);
   }
 
   &:active {
