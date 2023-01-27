@@ -54,7 +54,7 @@
 }
 
 .secondary {
-  color: var(--bg);
+  color: var(--c-acc-text-secondary);
 
   &::before {
     opacity: 0.5;
@@ -75,7 +75,7 @@
 }
 
 .tetriary {
-  color: var(--bg);
+  color: var(--c-acc-text-secondary);
 
   &::before {
     opacity: 0;

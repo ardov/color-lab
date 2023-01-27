@@ -20,9 +20,10 @@ export function makeColors(
   /** App bg: for light = surface, for dark – darker */
   const appBg = makeColor(appBgL, c, h)
 
-  const surfaceNormal = makeColor(surfaceL, c, h)
-  const surfaceHover = adjustL(surfaceNormal, step, c)
-  const surfaceActive = adjustL(surfaceHover, step, c)
+  const surfaceChroma = Math.min(c, 0.08)
+  const surfaceNormal = makeColor(surfaceL, surfaceChroma, h)
+  const surfaceHover = adjustL(surfaceNormal, step, surfaceChroma)
+  const surfaceActive = adjustL(surfaceHover, step, surfaceChroma)
   // const surfaceActive = adjustContrast(base, { l: 0, c, h, mode: 'oklch' }, 15)
   // const surfaceHover = makeColor((surface.l + surfaceActive.l) / 2, c, h)
 
