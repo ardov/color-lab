@@ -1,24 +1,13 @@
+import { Routes, Route } from 'react-router-dom'
 import './index.scss'
 import './reset.scss'
-import { Layout } from '@/shared/ui/Layout'
-import { Showcase } from '@/shared/ui/Showcase'
-import { ThemeProvider } from './ThemeProvider'
-import { useCallback, useState } from 'react'
-import { TTheme } from '@/shared/lib/theme'
+import { Themer } from '@/pages/themer'
 
 export default function App() {
-  const [light, setLight] = useState<TTheme | undefined>()
-  const [dark, setDark] = useState<TTheme | undefined>()
-  const updateThemes = useCallback((light: TTheme, dark: TTheme) => {
-    setLight(light)
-    setDark(dark)
-  }, [])
-
   return (
-    <Layout
-      leftPanel={<ThemeProvider onChange={updateThemes} />}
-      mainPanel={<Showcase theme={light} />}
-      mainPanel2={<Showcase theme={dark} />}
-    />
+    <Routes>
+      <Route index element={<Themer />} />
+      <Route path="*" element={<Themer />} />
+    </Routes>
   )
 }
