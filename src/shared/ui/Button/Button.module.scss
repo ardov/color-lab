@@ -5,6 +5,8 @@
   padding: 2px 16px;
   min-height: 32px;
 
+  display: inline-flex;
+  align-items: center;
   position: relative;
   isolation: isolate;
   border-radius: var(--r-m);

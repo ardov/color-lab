@@ -5,7 +5,7 @@ import { TTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'
 import { Notice } from '@/shared/ui/Notice'
 import { Stack } from '@/shared/ui/Stack'
-import { applyTheme } from '@/app/applyTheme'
+import { applyTheme } from '@/shared/lib/theme/applyTheme'
 
 export type ShowcaseProps = {
   theme?: TTheme

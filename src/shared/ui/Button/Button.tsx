@@ -1,16 +1,24 @@
-import { ButtonHTMLAttributes, FC } from 'react'
+import { FC } from 'react'
 import { clsx } from 'clsx'
 import classes from './Button.module.scss'
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = React.HTMLAttributes<HTMLOrSVGElement> & {
   size?: 'l' | 'm'
   use?: 'primary' | 'secondary' | 'tetriary'
+  tag?: keyof JSX.IntrinsicElements
 }
 
 export const Button: FC<ButtonProps> = props => {
-  const { children, className, size, use = 'primary', ...delegated } = props
+  const {
+    tag: Wrapper = 'button',
+    children,
+    className,
+    size,
+    use = 'primary',
+    ...delegated
+  } = props
   return (
-    <button
+    <Wrapper
       className={clsx(
         classes.root,
         {
@@ -23,6 +31,6 @@ export const Button: FC<ButtonProps> = props => {
       {...delegated}
     >
       {children}
-    </button>
+    </Wrapper>
   )
 }

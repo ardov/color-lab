@@ -25,7 +25,7 @@ export function makeTheme(opts: TThemeOpts) {
       acc: makeColors(accC, accH, themeType, cr),
       main: makeColors(mainC, mainH, themeType, cr),
     },
-    shadow: makeShadows(Math.max(mainC, 0.06), mainH, themeType),
+    shadow: makeShadows(mainC && Math.max(mainC, 0.06), mainH, themeType),
   }
 
   return theme
