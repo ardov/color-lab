@@ -1,1 +1,1 @@
-export { Channelizer } from './Splitter'
+export { Splitter } from './Splitter'

@@ -58,7 +58,7 @@ const ThemeProvider: React.FC<{ children: React.ReactNode }> = props => {
   return <>{props.children}</>
 }
 
-export const Channelizer: React.FC = () => {
+export const Splitter: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [sourceImage, setSourceImage] = useState<ImageData>()
   const [cache, setCache] = useState<Record<string, ImageData>>({})
