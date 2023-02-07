@@ -37,6 +37,17 @@ const noHue: TShader = color => {
   okColor.h = 327
   return RgbToRGBA(rgb(clampChroma(okColor)))
 }
+const edgy: TShader = color => {
+  const [r, g, b, a] = color
+  const black = [0, 0, 0, 255] as RGBA
+  const onEdge = (n: number) => n <= 1 || n >= 254
+
+  if (onEdge(r) || onEdge(g) || onEdge(b)) {
+    const { c } = oklch(RGBAtoRgb(color))
+    if (c > 0.03) return color
+  }
+  return black
+}
 
 const shaders = {
   source,
@@ -45,6 +56,7 @@ const shaders = {
   chromaOnly,
   noLightness,
   noHue,
+  edgy,
 }
 
 type TKey = keyof typeof shaders
@@ -151,6 +163,7 @@ export const Splitter: React.FC = () => {
     { key: 'hueOnly', name: 'Hue' },
     { key: 'noLightness', name: 'Hue + chroma' },
     { key: 'noHue', name: 'Lightness + chroma' },
+    { key: 'edgy', name: 'P3 improvable' },
   ]
 
   return (
