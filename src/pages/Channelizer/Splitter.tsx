@@ -37,11 +37,31 @@ const noHue: TShader = color => {
   okColor.h = 327
   return RgbToRGBA(rgb(clampChroma(okColor)))
 }
-const moreChroma: TShader = color => {
+const maxChroma: TShader = color => {
   const okColor = oklch(RGBAtoRgb(color))
   return RgbToRGBA(rgb(clampChroma({ ...okColor, c: okColor.c + 1 })))
 }
 const edgy: TShader = color => {
+  const black = [0, 0, 0, 255] as RGBA
+
+  // The most saturated colors are on edges of RGB cube
+  if (isOnEdge(color)) return color
+  return black
+
+  function isOnEdge(color: RGBA) {
+    const [r, g, b] = color
+    const tolerance = 1
+    return (
+      r <= 0 + tolerance ||
+      r >= 255 - tolerance ||
+      g <= 0 + tolerance ||
+      g >= 255 - tolerance ||
+      b <= 0 + tolerance ||
+      b >= 255 - tolerance
+    )
+  }
+}
+const p3Improvable: TShader = color => {
   const black = [0, 0, 0, 255] as RGBA
 
   // Cut out nearly black and nearly white colors
@@ -83,22 +103,10 @@ const shdrs: { key: string; shader: TShader; name: string }[] = [
   { key: 'hueOnly', shader: hueOnly, name: 'Hue' },
   { key: 'noLightness', shader: noLightness, name: 'Hue + chroma' },
   { key: 'noHue', shader: noHue, name: 'Lightness + chroma' },
-  { key: 'edgy', shader: edgy, name: 'P3 improvable' },
-  { key: 'moreChroma', shader: moreChroma, name: 'Max chroma' },
+  { key: 'edgy', shader: edgy, name: 'sRGB edge' },
+  { key: 'p3Improvable', shader: p3Improvable, name: 'P3 improvable' },
+  { key: 'moreChroma', shader: maxChroma, name: 'Max chroma' },
 ]
-
-const shaders = {
-  source,
-  lightnessOnly,
-  hueOnly,
-  chromaOnly,
-  noLightness,
-  noHue,
-  moreChroma,
-  edgy,
-}
-
-type TKey = keyof typeof shaders
 
 // —————————————————————————————————————————————————————————————————————————————
 // Component
@@ -115,7 +123,7 @@ export const Splitter: React.FC = () => {
   const [color, setColor] = useState<string>('')
   const [sourceImage, setSourceImage] = useState<ImageData>()
   const [cache, setCache] = useState<Record<string, ImageData>>({})
-  const [currKey, setCurrKey] = useState<TKey>('source')
+  const [currKey, setCurrKey] = useState<string>('source')
 
   const setSource = useCallback((data: ImageData) => {
     setCurrKey('source')
@@ -183,7 +191,7 @@ export const Splitter: React.FC = () => {
     }
   }, [loadFile])
 
-  const updateImg = (key: TKey) => {
+  const updateImg = (key: string, shader: TShader) => {
     setCurrKey(key)
     if (!sourceImage) return
     const canvas = canvasRef.current!
@@ -192,7 +200,7 @@ export const Splitter: React.FC = () => {
       ctx.putImageData(cache[key], 0, 0)
       return
     }
-    const newImageData = runShader(sourceImage, shaders[key])
+    const newImageData = runShader(sourceImage, shader)
     setCache(c => ({ ...c, [key]: newImageData }))
     ctx.putImageData(newImageData, 0, 0)
   }
@@ -211,17 +219,6 @@ export const Splitter: React.FC = () => {
     },
     []
   )
-
-  const modes: { key: TKey; name: string }[] = [
-    { key: 'source', name: 'Source' },
-    { key: 'lightnessOnly', name: 'Lightness' },
-    { key: 'chromaOnly', name: 'Chroma' },
-    { key: 'hueOnly', name: 'Hue' },
-    { key: 'noLightness', name: 'Hue + chroma' },
-    { key: 'noHue', name: 'Lightness + chroma' },
-    { key: 'edgy', name: 'P3 improvable' },
-    { key: 'moreChroma', name: 'Max chroma' },
-  ]
 
   return (
     <ThemeProvider>
@@ -258,11 +255,11 @@ export const Splitter: React.FC = () => {
         </Stack>
 
         <Stack gap={1} axis="x" style={{ flexWrap: 'wrap' }}>
-          {modes.map(({ key, name }) => (
+          {shdrs.map(({ key, name, shader }) => (
             <Button
               key={key}
               use={currKey === key ? 'primary' : 'secondary'}
-              onClick={() => updateImg(key)}
+              onClick={() => updateImg(key, shader)}
               children={name}
             />
           ))}
