@@ -1,4 +1,4 @@
-import { adjustContrast, adjustL, getAlphaColor } from '@/shared/lib/colors'
+import { adjustContrast, adjustL, getAlphaColor } from '@/shared/lib/huevo'
 import { formatHsl, hsl } from 'culori'
 import { makeColor } from './makeColor'
 

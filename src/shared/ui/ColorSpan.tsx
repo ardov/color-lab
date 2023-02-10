@@ -1,5 +1,5 @@
 import { Color, formatHex8, parse, rgb, Rgb } from 'culori'
-import { findTextTone } from '@/shared/lib/colors'
+import { findTextTone } from '@/shared/lib/huevo'
 import { ReactNode } from 'react'
 
 function ColorSpan(props: {

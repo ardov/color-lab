@@ -1,5 +1,5 @@
 import { Oklch } from 'culori'
-import { clampChroma, findTextTone } from './colors'
+import { clampChroma, findTextTone } from './huevo'
 
 type TLRule =
   | number

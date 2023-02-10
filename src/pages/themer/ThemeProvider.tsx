@@ -1,5 +1,5 @@
 import { formatHex } from 'culori'
-import { getContrastText } from '@/shared/lib/colors'
+import { getContrastText } from '@/shared/lib/huevo'
 import { useEffect, useMemo, useState } from 'react'
 import { TTheme, makeTheme, applyTheme, flattenTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'

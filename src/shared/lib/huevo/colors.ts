@@ -1,35 +1,32 @@
-import {
-  clampRgb,
-  Color,
-  Oklch,
-  oklch,
-  parse,
-  rgb,
-  Rgb,
-  displayable,
-} from 'culori'
+import type { Color, Oklch, Rgb } from 'culori'
+import { clampRgb, oklch, parse, rgb, displayable } from 'culori'
 import { APCAcontrast, sRGBtoY } from 'apca-w3'
-import { findLowest, findHighest } from './binary-search'
+import { findLowest, findHighest } from './binarySearch'
 
-export function blendColors(low: Rgb, top: Rgb) {
+/** Blends two colors according to their alpha */
+export function blendColors(low: Rgb, top: Rgb): Rgb {
   const topA = top.alpha === undefined ? 1 : top.alpha
   const lowA = low.alpha === undefined ? 1 : low.alpha
-
   const alpha = topA + lowA * (1 - topA)
-
-  const getC = (topV: number, lowV: number) =>
-    (topV * topA + lowV * lowA * (1 - topA)) / alpha
-
+  const calcChannel = (topV: number, lowV: number) => {
+    return (topV * topA + lowV * lowA * (1 - topA)) / alpha
+  }
   return {
     mode: 'rgb',
     alpha,
-    r: getC(top.r, low.r),
-    g: getC(top.g, low.g),
-    b: getC(top.b, low.b),
-  } as Rgb
+    r: calcChannel(top.r, low.r),
+    g: calcChannel(top.g, low.g),
+    b: calcChannel(top.b, low.b),
+  }
 }
 
-export function getAlphaColor(bg: Rgb, target: Rgb) {
+/**
+ * Returns color with opacity that would look exactly
+ * @param bg background color
+ * @param target color that we want to imitate with opacity
+ * @returns
+ */
+export function getAlphaColor(bg: Rgb, target: Rgb): Rgb {
   const alpha = Math.max(
     findLowestAlpha(bg.r, target.r),
     findLowestAlpha(bg.g, target.g),
@@ -42,18 +39,18 @@ export function getAlphaColor(bg: Rgb, target: Rgb) {
     g: calcChannel(bg.g, target.g, alpha),
     b: calcChannel(bg.b, target.b, alpha),
   } as Rgb
-}
 
-function findLowestAlpha(bg: number, target: number) {
-  for (let a = 1; a <= 100; a++) {
-    let ch = calcChannel(bg, target, a / 100)
-    if (ch >= 0 && ch <= 1) return a / 100
+  function findLowestAlpha(bg: number, target: number) {
+    for (let a = 1; a <= 100; a++) {
+      let ch = calcChannel(bg, target, a / 100)
+      if (ch >= 0 && ch <= 1) return a / 100
+    }
+    return 1
   }
-  return 1
-}
 
-function calcChannel(bg: number, target: number, alpha: number) {
-  return bg + (target - bg) / alpha
+  function calcChannel(bg: number, target: number, alpha: number) {
+    return bg + (target - bg) / alpha
+  }
 }
 
 export function calcAPCA(bg: Color | string, txt: Color | string): number {
@@ -69,8 +66,7 @@ export function calcAPCA(bg: Color | string, txt: Color | string): number {
 
 export function clampChroma(color: Oklch) {
   if (displayable(color)) return color
-  const check = (c: number) => displayable({ ...color, c })
-  let c = findHighest(check, [0, 0.5])
+  let c = findHighest(c => displayable({ ...color, c }), [0, 0.5])
   return { ...color, c } as Oklch
 }
 

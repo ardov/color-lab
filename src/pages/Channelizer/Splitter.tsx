@@ -1,4 +1,4 @@
-import { clampChroma } from '@/shared/lib/colors'
+import { clampChroma, displayable } from '@/shared/lib/huevo'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'
 import { Stack } from '@/shared/ui/Stack'
@@ -75,7 +75,7 @@ const p3Improvable: TShader = color => {
   //  minimal chroma improvement that will be counted
   const minImprovement = 0.02
   const okColor = oklch(RGBAtoRgb(color))
-  const canBeImproved = displayableP3({
+  const canBeImproved = displayable({
     ...okColor,
     c: okColor.c + minImprovement,
   })
@@ -327,18 +327,6 @@ function duplicateImageData(imageData: ImageData): ImageData {
   const newImageData = new ImageData(imageData.width, imageData.height)
   newImageData.data.set(imageData.data)
   return newImageData
-}
-
-function displayableP3(color: Color): boolean {
-  const colorP3 = p3(color)
-  return (
-    colorP3.r >= 0 &&
-    colorP3.r <= 1 &&
-    colorP3.g >= 0 &&
-    colorP3.g <= 1 &&
-    colorP3.b >= 0 &&
-    colorP3.b <= 1
-  )
 }
 
 function getEventColor(
