@@ -1,5 +1,4 @@
 import { formatHex } from 'culori'
-import { getContrastText } from '@/shared/lib/huevo'
 import { useEffect, useMemo, useState } from 'react'
 import { TTheme, makeTheme, applyTheme, flattenTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'
@@ -7,27 +6,46 @@ import { Stack } from '@/shared/ui/Stack/Stack'
 import { entries } from '@/shared/types'
 import { Slider } from '@/shared/ui/Slider'
 import { Tooltip } from '@/shared/ui/Tooltip'
+import { getContrastColor } from '@/shared/lib/huevo'
 
 export function ThemeProvider(props: {
+  theme: 'dark' | 'light'
   onChange: (light: TTheme, dark: TTheme) => void
+  onToggle: () => void
 }) {
+  const themeType = props.theme
   const [mainH, setMainH] = useState(280)
+  const [hueShift, setHueShift] = useState(0)
   const [mainC, setMainC] = useState(0.01)
   // const [accH, setAccH] = useState(280)
   const [accC, setAccC] = useState(0.3)
-  const [cr, setCr] = useState(60)
-  const [themeType, setThemeType] = useState<'light' | 'dark'>('light')
-
-  const toggleTheme = () =>
-    setThemeType(t => (t === 'light' ? 'dark' : 'light'))
+  const [cr, setCr] = useState(7)
 
   const lightTheme = useMemo(
-    () => makeTheme({ mainC, mainH, accC, accH: mainH, type: 'light', cr }),
-    [accC, cr, mainC, mainH]
+    () =>
+      makeTheme({
+        mainC,
+        mainH,
+        accC,
+        accH: mainH,
+        type: 'light',
+        cr,
+        hueShift,
+      }),
+    [accC, cr, hueShift, mainC, mainH]
   )
   const darkTheme = useMemo(
-    () => makeTheme({ mainC, mainH, accC, accH: mainH, type: 'dark', cr }),
-    [accC, cr, mainC, mainH]
+    () =>
+      makeTheme({
+        mainC,
+        mainH,
+        accC,
+        accH: mainH,
+        type: 'dark',
+        cr,
+        hueShift,
+      }),
+    [accC, cr, hueShift, mainC, mainH]
   )
 
   useEffect(() => {
@@ -42,12 +60,13 @@ export function ThemeProvider(props: {
 
   return (
     <Stack gap={1} p={3} style={{ color: 'var(--c-main-text-primary)' }}>
-      <Button onClick={toggleTheme}>Toggle theme</Button>
+      <Button onClick={props.onToggle}>Toggle theme</Button>
       <label>
         <span>Btn contrast: {cr}</span>
         <Slider
           min={0}
-          max={120}
+          max={21}
+          step={0.1}
           value={[cr]}
           onValueChange={value => setCr(value[0])}
         />
@@ -62,6 +81,16 @@ export function ThemeProvider(props: {
           max={360}
           value={[mainH]}
           onValueChange={value => setMainH(value[0])}
+        />
+      </label>
+
+      <label>
+        <span>Hue shift: {hueShift}</span>
+        <Slider
+          min={-100}
+          max={100}
+          value={[hueShift]}
+          onValueChange={value => setHueShift(value[0])}
         />
       </label>
 
@@ -105,7 +134,7 @@ export function ThemeProvider(props: {
               style={{
                 padding: 8,
                 background: val,
-                color: formatHex(getContrastText(val)),
+                color: formatHex(getContrastColor(val)),
               }}
               onClick={() => navigator.clipboard.writeText(varName)}
             >

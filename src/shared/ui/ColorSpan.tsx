@@ -1,6 +1,6 @@
 import { Color, formatHex8, parse, rgb, Rgb } from 'culori'
-import { findTextTone } from '@/shared/lib/huevo'
 import { ReactNode } from 'react'
+import { getContrastColor } from '../lib/huevo'
 
 function ColorSpan(props: {
   value: Color | string
@@ -12,8 +12,8 @@ function ColorSpan(props: {
     (typeof value === 'string' ? rgb(parse(value)) : rgb(value)) ||
     ({ mode: 'rgb', r: 1, g: 0, b: 0, alpha: 1 } as Rgb)
   // const textColor = getContrastText(bg)
-  const textColor = findTextTone(bg, 60, 1)
-  const borderColor = findTextTone(bg, 15)
+  const textColor = getContrastColor(bg, 60)
+  const borderColor = getContrastColor(bg, 15)
   // const borderColor = adjustL(bg, -0.1)
   const border = formatHex8(borderColor)
   const bgHex = formatHex8(bg)

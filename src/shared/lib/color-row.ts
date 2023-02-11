@@ -1,5 +1,5 @@
 import { Oklch } from 'culori'
-import { clampChroma, findTextTone } from './huevo'
+import { clampChroma, getContrastColor } from './huevo'
 
 type TLRule =
   | number
@@ -17,7 +17,7 @@ export function resolveRow(hue: number, chroma: number, row: TLRule[]) {
       lRow.push(lRow[rule.index] + rule.change)
     } else if (rule.type === 'contrast') {
       if (rule.index >= i) throw new Error('link to future')
-      const resultingColor = findTextTone(
+      const resultingColor = getContrastColor(
         clampChroma({ mode: 'oklch', l: lRow[rule.index], c: chroma, h: hue }),
         rule.value
       )

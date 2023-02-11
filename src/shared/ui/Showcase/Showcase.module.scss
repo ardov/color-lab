@@ -1,3 +1,10 @@
+.container {
+  min-height: 100%;
+  background: var(--c-main-app-bg);
+  display: flex;
+  justify-content: center;
+}
+
 .card {
   border-radius: var(--r-l);
   background-color: var(--c-main-base);

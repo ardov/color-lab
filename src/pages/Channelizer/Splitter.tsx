@@ -1,8 +1,14 @@
-import { clampChroma, displayable } from '@/shared/lib/huevo'
+import {
+  clampChroma,
+  displayable,
+  fromRGBA,
+  RGBA,
+  toRGBA,
+} from '@/shared/lib/huevo'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'
 import { Stack } from '@/shared/ui/Stack'
-import { oklch, rgb, Rgb, p3, Color } from 'culori'
+import { oklch, rgb } from 'culori'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 // —————————————————————————————————————————————————————————————————————————————
@@ -10,36 +16,40 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 const source: TShader = color => color
 const lightnessOnly: TShader = color => {
-  const okColor = oklch(RGBAtoRgb(color))
+  const okColor = oklch(fromRGBA(color))
   okColor.c = 0
   okColor.h = 0
-  return RgbToRGBA(rgb(clampChroma(okColor)))
+  return toRGBA(rgb(clampChroma(okColor)))
 }
 const hueOnly: TShader = color => {
-  const okColor = oklch(RGBAtoRgb(color))
+  const okColor = oklch(fromRGBA(color))
   okColor.l = 0.75
   okColor.c = 0.125
-  return RgbToRGBA(rgb(clampChroma(okColor)))
+  return toRGBA(rgb(clampChroma(okColor)))
 }
 const chromaOnly: TShader = color => {
-  const okColor = oklch(RGBAtoRgb(color))
+  const okColor = oklch(fromRGBA(color))
   okColor.l = 0.728
   okColor.h = 327
-  return RgbToRGBA(rgb(clampChroma(okColor)))
+  return toRGBA(rgb(clampChroma(okColor)))
 }
 const noLightness: TShader = color => {
-  const okColor = oklch(RGBAtoRgb(color))
+  const okColor = oklch(fromRGBA(color))
   okColor.l = 0.75
-  return RgbToRGBA(rgb(clampChroma(okColor)))
+  return toRGBA(rgb(clampChroma(okColor)))
+}
+const noRed: TShader = color => {
+  color[0] = 0
+  return color
 }
 const noHue: TShader = color => {
-  const okColor = oklch(RGBAtoRgb(color))
+  const okColor = oklch(fromRGBA(color))
   okColor.h = 327
-  return RgbToRGBA(rgb(clampChroma(okColor)))
+  return toRGBA(rgb(clampChroma(okColor)))
 }
 const maxChroma: TShader = color => {
-  const okColor = oklch(RGBAtoRgb(color))
-  return RgbToRGBA(rgb(clampChroma({ ...okColor, c: okColor.c + 1 })))
+  const okColor = oklch(fromRGBA(color))
+  return toRGBA(rgb(clampChroma({ ...okColor, c: okColor.c + 1 })))
 }
 const edgy: TShader = color => {
   const black = [0, 0, 0, 255] as RGBA
@@ -74,7 +84,7 @@ const p3Improvable: TShader = color => {
 
   //  minimal chroma improvement that will be counted
   const minImprovement = 0.02
-  const okColor = oklch(RGBAtoRgb(color))
+  const okColor = oklch(fromRGBA(color))
   const canBeImproved = displayable({
     ...okColor,
     c: okColor.c + minImprovement,
@@ -106,6 +116,7 @@ const shdrs: { key: string; shader: TShader; name: string }[] = [
   { key: 'edgy', shader: edgy, name: 'sRGB edge' },
   { key: 'p3Improvable', shader: p3Improvable, name: 'P3 improvable' },
   { key: 'moreChroma', shader: maxChroma, name: 'Max chroma' },
+  { key: 'noRed', shader: noRed, name: 'No red' },
 ]
 
 // —————————————————————————————————————————————————————————————————————————————
@@ -283,7 +294,6 @@ export const Splitter: React.FC = () => {
 // —————————————————————————————————————————————————————————————————————————————
 // Helpers
 
-type RGBA = [number, number, number, number]
 type TShader = (color: RGBA) => RGBA
 
 function runShader(source: ImageData, shader: TShader): ImageData {
@@ -294,33 +304,12 @@ function runShader(source: ImageData, shader: TShader): ImageData {
     const color = [data[i], data[i + 1], data[i + 2], data[i + 3]] as RGBA
     const key = color.join(',')
     let [r, g, b, a] = (cache[key] ??= shader(color))
-
-    // const [r, g, b, a] = shader([
-    //   data[i],
-    //   data[i + 1],
-    //   data[i + 2],
-    //   data[i + 3],
-    // ])
     data[i] = r
     data[i + 1] = g
     data[i + 2] = b
     data[i + 3] = a
   }
   return imageData
-}
-
-function RGBAtoRgb([r, g, b, a]: RGBA) {
-  return {
-    mode: 'rgb',
-    alpha: a / 255,
-    r: r / 255,
-    g: g / 255,
-    b: b / 255,
-  } as Rgb
-}
-
-function RgbToRGBA({ r, g, b, alpha }: Rgb) {
-  return [r * 255, g * 255, b * 255, alpha ? alpha * 255 : 255] as RGBA
 }
 
 function duplicateImageData(imageData: ImageData): ImageData {

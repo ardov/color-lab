@@ -1,11 +1,12 @@
+export type { RGBA } from './canvasColors'
+export { fromRGBA, toRGBA } from './canvasColors'
 export {
   blendColors,
   getAlphaColor,
-  calcAPCA,
   clampChroma,
-  getContrastText,
   adjustL,
   adjustContrast,
-  findTextTone,
 } from './colors'
 export { displayable } from './displayable'
+export { betterToe, betterToeInv } from './okToe'
+export { apcaContrast, getContrastColor } from './contrast'

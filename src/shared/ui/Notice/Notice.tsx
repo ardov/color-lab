@@ -11,8 +11,8 @@ export const Notice: FC<NoticeProps> = props => {
   const { title, body, ...delegated } = props
   return (
     <div className={classes.root}>
-      {!!title && <p>{title}</p>}
-      {!!body && <p>{body}</p>}
+      {!!title && <div>{title}</div>}
+      {!!body && <div>{body}</div>}
     </div>
   )
 }
