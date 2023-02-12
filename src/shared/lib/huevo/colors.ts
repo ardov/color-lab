@@ -54,9 +54,12 @@ export function getAlphaColor(bg: Rgb, target: Rgb): Rgb {
   }
 }
 
-export function clampChroma(color: Oklch, mode: 'rgb' | 'p3' = 'rgb') {
+export function clampChroma(
+  color: Oklch,
+  mode: 'srgb' | 'display-p3' = 'srgb'
+) {
   if (displayable(color, mode)) return color
-  let c = findHighest(c => displayable({ ...color, c }, mode), [0, 0.5])
+  let c = findHighest(c => displayable({ ...color, c }, mode), [0, 0.4])
   return { ...color, c } as Oklch
 }
 

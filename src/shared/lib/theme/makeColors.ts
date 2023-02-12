@@ -71,7 +71,13 @@ export function makeColors(
   const appBgL = { light: 0.975, dark: 0.05 }
   const step = { light: -0.04, dark: 0.04 }
   const shadowL = { light: 0.1, dark: 0.1 }
-  const getHue = (l: number) => hue + hueShift * clamp(l)
+  const getHue = (l: number) => {
+    return themeType === 'light'
+      ? lerp(hue, hue + hueShift, l)
+      : lerp(hue + hueShift, hue, l)
+  }
+
+  console.log('Hue', themeType, getHue(0), getHue(1))
 
   const lowC = Math.min(chroma, 0.08)
 
@@ -160,4 +166,8 @@ function clamp(x: number, min = 0, max = 1) {
   if (x >= max) return max
   if (x <= min) return min
   return x
+}
+
+function lerp(from: number, to: number, t: number) {
+  return from + (to - from) * clamp(t)
 }

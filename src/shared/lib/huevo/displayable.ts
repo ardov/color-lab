@@ -1,7 +1,10 @@
 import { Color, p3, rgb } from 'culori'
 
-export function displayable(color: Color | string, mode: 'rgb' | 'p3' = 'rgb') {
-  const c = mode === 'p3' ? p3(color) : rgb(color)
+export function displayable(
+  color: Color | string,
+  mode: 'srgb' | 'display-p3' = 'srgb'
+) {
+  const c = mode === 'srgb' ? rgb(color) : p3(color)
   return (
     c !== undefined &&
     c.r >= 0 &&

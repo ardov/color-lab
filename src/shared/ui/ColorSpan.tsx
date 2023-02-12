@@ -2,7 +2,7 @@ import { Color, formatHex8, parse, rgb, Rgb } from 'culori'
 import { ReactNode } from 'react'
 import { getContrastColor } from '../lib/huevo'
 
-function ColorSpan(props: {
+export function ColorSpan(props: {
   value: Color | string
   name?: string
   children?: ReactNode
@@ -22,6 +22,7 @@ function ColorSpan(props: {
   return (
     <span
       style={{
+        fontFamily: 'monospace',
         background: bgHex,
         padding: '2px 0',
         borderRadius: 8,

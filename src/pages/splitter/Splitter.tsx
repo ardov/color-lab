@@ -1,126 +1,14 @@
-import {
-  clampChroma,
-  displayable,
-  fromRGBA,
-  RGBA,
-  toRGBA,
-} from '@/shared/lib/huevo'
+import { RGBA } from '@/shared/lib/huevo'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'
 import { Stack } from '@/shared/ui/Stack'
-import { oklch, rgb } from 'culori'
+import { oklch, P3, rgb, Rgb } from 'culori'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { lenses, TLense } from './lenses'
 
-// —————————————————————————————————————————————————————————————————————————————
-// Shaders
+type Position = [number, number]
 
-const source: TShader = color => color
-const lightnessOnly: TShader = color => {
-  const okColor = oklch(fromRGBA(color))
-  okColor.c = 0
-  okColor.h = 0
-  return toRGBA(rgb(clampChroma(okColor)))
-}
-const hueOnly: TShader = color => {
-  const okColor = oklch(fromRGBA(color))
-  okColor.l = 0.75
-  okColor.c = 0.125
-  return toRGBA(rgb(clampChroma(okColor)))
-}
-const chromaOnly: TShader = color => {
-  const okColor = oklch(fromRGBA(color))
-  okColor.l = 0.728
-  okColor.h = 327
-  return toRGBA(rgb(clampChroma(okColor)))
-}
-const noLightness: TShader = color => {
-  const okColor = oklch(fromRGBA(color))
-  okColor.l = 0.75
-  return toRGBA(rgb(clampChroma(okColor)))
-}
-const noRed: TShader = color => {
-  color[0] = 0
-  return color
-}
-const noHue: TShader = color => {
-  const okColor = oklch(fromRGBA(color))
-  okColor.h = 327
-  return toRGBA(rgb(clampChroma(okColor)))
-}
-const maxChroma: TShader = color => {
-  const okColor = oklch(fromRGBA(color))
-  return toRGBA(rgb(clampChroma({ ...okColor, c: okColor.c + 1 })))
-}
-const edgy: TShader = color => {
-  const black = [0, 0, 0, 255] as RGBA
-
-  // The most saturated colors are on edges of RGB cube
-  if (isOnEdge(color)) return color
-  return black
-
-  function isOnEdge(color: RGBA) {
-    const [r, g, b] = color
-    const tolerance = 1
-    return (
-      r <= 0 + tolerance ||
-      r >= 255 - tolerance ||
-      g <= 0 + tolerance ||
-      g >= 255 - tolerance ||
-      b <= 0 + tolerance ||
-      b >= 255 - tolerance
-    )
-  }
-}
-const p3Improvable: TShader = color => {
-  const black = [0, 0, 0, 255] as RGBA
-
-  // Cut out nearly black and nearly white colors
-  const [r, g, b] = color
-  if (r < 5 && g < 5 && b < 5) return black
-  if (r > 250 && g > 250 && b > 250) return black
-
-  // The most saturated colors are on edges of RGB cube
-  if (!isOnEdge(color)) return black
-
-  //  minimal chroma improvement that will be counted
-  const minImprovement = 0.02
-  const okColor = oklch(fromRGBA(color))
-  const canBeImproved = displayable({
-    ...okColor,
-    c: okColor.c + minImprovement,
-  })
-
-  return canBeImproved ? color : black
-
-  function isOnEdge(color: RGBA) {
-    const [r, g, b] = color
-    const tolerance = 1
-    return (
-      r <= 0 + tolerance ||
-      r >= 255 - tolerance ||
-      g <= 0 + tolerance ||
-      g >= 255 - tolerance ||
-      b <= 0 + tolerance ||
-      b >= 255 - tolerance
-    )
-  }
-}
-
-const shdrs: { key: string; shader: TShader; name: string }[] = [
-  { key: 'source', shader: source, name: 'Source' },
-  { key: 'lightnessOnly', shader: lightnessOnly, name: 'Lightness' },
-  { key: 'chromaOnly', shader: chromaOnly, name: 'Chroma' },
-  { key: 'hueOnly', shader: hueOnly, name: 'Hue' },
-  { key: 'noLightness', shader: noLightness, name: 'Hue + chroma' },
-  { key: 'noHue', shader: noHue, name: 'Lightness + chroma' },
-  { key: 'edgy', shader: edgy, name: 'sRGB edge' },
-  { key: 'p3Improvable', shader: p3Improvable, name: 'P3 improvable' },
-  { key: 'moreChroma', shader: maxChroma, name: 'Max chroma' },
-  { key: 'noRed', shader: noRed, name: 'No red' },
-]
-
-// —————————————————————————————————————————————————————————————————————————————
-// Component
+const black: Rgb = { mode: 'rgb', r: 0, g: 0, b: 0 }
 
 const theme = makeTheme({ cr: 200 })
 const ThemeProvider: React.FC<{ children: React.ReactNode }> = props => {
@@ -130,14 +18,19 @@ const ThemeProvider: React.FC<{ children: React.ReactNode }> = props => {
 
 export const Splitter: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [loadAsP3, setLoadAsP3] = useState(false)
   const [curColor, setCurColor] = useState<string>('')
   const [color, setColor] = useState<string>('')
   const [sourceImage, setSourceImage] = useState<ImageData>()
   const [cache, setCache] = useState<Record<string, ImageData>>({})
-  const [currKey, setCurrKey] = useState<string>('source')
+  const [currKey, setCurrKey] = useState<string>('Source')
+  const [hoverPos, setHoverPos] = useState<Position>([0, 0])
+  const [selectedColor, setSelectedColor] = useState<Rgb | P3>(black)
+
+  const supportP3 = window.matchMedia('(color-gamut: p3)').matches
 
   const setSource = useCallback((data: ImageData) => {
-    setCurrKey('source')
+    setCurrKey('Source')
     setSourceImage(data)
     const canvas = canvasRef.current!
     canvas.width = data.width
@@ -151,7 +44,9 @@ export const Splitter: React.FC = () => {
     (file?: File | null) => {
       if (!file) return
       const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', {
+        colorSpace: loadAsP3 ? 'display-p3' : 'srgb',
+      })
       if (ctx) {
         const img = new Image()
         img.src = URL.createObjectURL(file)
@@ -163,7 +58,7 @@ export const Splitter: React.FC = () => {
         }
       }
     },
-    [setSource]
+    [loadAsP3, setSource]
   )
 
   const loadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -202,7 +97,17 @@ export const Splitter: React.FC = () => {
     }
   }, [loadFile])
 
-  const updateImg = (key: string, shader: TShader) => {
+  const forceUpdateImg = (key: string, lense: TLense) => {
+    setCurrKey(key)
+    if (!sourceImage) return
+    const canvas = canvasRef.current!
+    const ctx = canvas.getContext('2d')!
+    const newImageData = lense(sourceImage)
+    setCache(c => ({ ...c, [key]: newImageData }))
+    ctx.putImageData(newImageData, 0, 0)
+  }
+
+  const updateImg = (key: string, lense: TLense) => {
     setCurrKey(key)
     if (!sourceImage) return
     const canvas = canvasRef.current!
@@ -211,7 +116,7 @@ export const Splitter: React.FC = () => {
       ctx.putImageData(cache[key], 0, 0)
       return
     }
-    const newImageData = runShader(sourceImage, shader)
+    const newImageData = lense(sourceImage)
     setCache(c => ({ ...c, [key]: newImageData }))
     ctx.putImageData(newImageData, 0, 0)
   }
@@ -220,6 +125,7 @@ export const Splitter: React.FC = () => {
     (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
       const [r, g, b] = getEventColor(event)
       setCurColor(`rgb(${r}, ${g}, ${b})`)
+      setHoverPos(getPosition(event))
     },
     []
   )
@@ -227,8 +133,9 @@ export const Splitter: React.FC = () => {
     (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
       const [r, g, b] = getEventColor(event)
       setColor(`rgb(${r}, ${g}, ${b})`)
+      setSelectedColor(getColor(cache[currKey], getPosition(event)))
     },
-    []
+    [cache, currKey]
   )
 
   return (
@@ -266,15 +173,21 @@ export const Splitter: React.FC = () => {
         </Stack>
 
         <Stack gap={1} axis="x" style={{ flexWrap: 'wrap' }}>
-          {shdrs.map(({ key, name, shader }) => (
+          {lenses.map(({ name, lense }) => (
             <Button
-              key={key}
-              use={currKey === key ? 'primary' : 'secondary'}
-              onClick={() => updateImg(key, shader)}
+              key={name}
+              use={currKey === name ? 'primary' : 'secondary'}
+              onClick={() => updateImg(name, lense)}
+              onDoubleClick={() => forceUpdateImg(name, lense)}
               children={name}
             />
           ))}
         </Stack>
+
+        <ColorInfo
+          color={getColor(cache[currKey], hoverPos)}
+          selected={selectedColor}
+        />
 
         <div>
           <canvas
@@ -294,35 +207,11 @@ export const Splitter: React.FC = () => {
 // —————————————————————————————————————————————————————————————————————————————
 // Helpers
 
-type TShader = (color: RGBA) => RGBA
-
-function runShader(source: ImageData, shader: TShader): ImageData {
-  const imageData = duplicateImageData(source)
-  const data = imageData.data
-  const cache: Record<string, RGBA> = {}
-  for (let i = 0; i < data.length; i += 4) {
-    const color = [data[i], data[i + 1], data[i + 2], data[i + 3]] as RGBA
-    const key = color.join(',')
-    let [r, g, b, a] = (cache[key] ??= shader(color))
-    data[i] = r
-    data[i + 1] = g
-    data[i + 2] = b
-    data[i + 3] = a
-  }
-  return imageData
-}
-
-function duplicateImageData(imageData: ImageData): ImageData {
-  const newImageData = new ImageData(imageData.width, imageData.height)
-  newImageData.data.set(imageData.data)
-  return newImageData
-}
-
 function getEventColor(
   event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
 ): RGBA {
   const canvas = event.currentTarget
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d', { colorSpace: 'display-p3' })
   if (!ctx) return [0, 0, 0, 0]
   const rect = canvas.getBoundingClientRect()
   const x =
@@ -330,4 +219,69 @@ function getEventColor(
   const y =
     ((event.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height
   return ctx.getImageData(x, y, 1, 1).data as unknown as RGBA
+}
+function getPosition(
+  event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+): Position {
+  const canvas = event.currentTarget
+  const rect = canvas.getBoundingClientRect()
+  const x = Math.round(
+    ((event.clientX - rect.left) / (rect.right - rect.left)) * canvas.width
+  )
+  const y = Math.round(
+    ((event.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height
+  )
+  return [x, y]
+}
+
+function getColor(imgData: ImageData, pos: Position) {
+  if (!imgData) return { mode: 'rgb', r: 0, g: 0, b: 0 } as Rgb
+  const [x, y] = pos
+  const { data, width, colorSpace } = imgData
+  const start = (y * width + x) * 4
+  const color = {
+    mode: colorSpace === 'srgb' ? 'rgb' : 'p3',
+    r: data[start] / 255,
+    g: data[start + 1] / 255,
+    b: data[start + 2] / 255,
+    alpha: data[start + 3] / 255,
+  } as Rgb | P3
+  return color
+}
+
+function ColorInfo(props: { color: Rgb | P3; selected: Rgb | P3 }) {
+  const c = rgb(props.color)
+  const ok = oklch(props.color)
+  const sc = rgb(props.selected)
+  const sok = oklch(props.selected)
+  return (
+    <>
+      <div style={{ fontFamily: 'monospace' }}>
+        {`R: ${(c.r * 255).toFixed().padEnd(4, ' ')}` +
+          ' ' +
+          `G: ${(c.g * 255).toFixed().padEnd(4, ' ')}` +
+          ' ' +
+          `B: ${(c.b * 255).toFixed().padEnd(4, ' ')}` +
+          '  ' +
+          `L: ${ok.l.toFixed(3).padEnd(6, ' ')}` +
+          ' ' +
+          `C: ${ok.c.toFixed(3).padEnd(6, ' ')}` +
+          ' ' +
+          `H: ${String(+(ok.h || 0).toFixed(3)).padEnd(6, ' ')}`}
+      </div>
+      <div style={{ fontFamily: 'monospace' }}>
+        {`R: ${(sc.r * 255).toFixed().padEnd(4, ' ')}` +
+          ' ' +
+          `G: ${(sc.g * 255).toFixed().padEnd(4, ' ')}` +
+          ' ' +
+          `B: ${(sc.b * 255).toFixed().padEnd(4, ' ')}` +
+          '  ' +
+          `L: ${sok.l.toFixed(3).padEnd(6, ' ')}` +
+          ' ' +
+          `C: ${sok.c.toFixed(3).padEnd(6, ' ')}` +
+          ' ' +
+          `H: ${String(+(sok.h || 0).toFixed(3)).padEnd(6, ' ')}`}
+      </div>
+    </>
+  )
 }

@@ -19,24 +19,29 @@ export function makeTheme(opts: TThemeOpts) {
   const accH = opts.accH || 0
   const accC = opts.accC || 0
   const hueShift = opts.hueShift || 0
-  const cr = opts.cr || 60
+  const contrast = opts.cr || 60
   const themeType = opts.type || 'light'
 
   const theme = {
     r: { m: '8px', l: '12px', xl: '16px' },
     c: {
       acc: makeColors(themeType, {
-        chroma: accC,
         hue: accH,
-        contrast: cr,
         hueShift,
+        chroma: accC,
+        contrast,
       }),
       main: makeColors(themeType, {
-        chroma: mainC,
         hue: mainH,
-        contrast: cr,
         hueShift,
+        chroma: mainC,
+        contrast,
       }),
+      // danger: makeColors(themeType, {
+      //   hue: mainH,
+      //   chroma: accC,
+      //   contrast,
+      // }),
     },
     shadow: makeShadows(mainC && Math.max(mainC, 0.06), mainH, themeType),
   }
