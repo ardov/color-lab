@@ -83,6 +83,7 @@ export function makeColors(
 
   // prettier-ignore
   const colors = {
+    // Name                Rule type            Value   Reference color   Chroma
     'base':           rule('LIGHTNESS',         baseL,  '',               lowC),
     'app-bg':         rule('LIGHTNESS',         appBgL, '',               lowC),
     'surface-normal': rule('LIGHTNESS_OFFSET',  step,   'base',           lowC),
