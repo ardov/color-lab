@@ -156,8 +156,8 @@ export function makeColors(
     return {
       rule,
       oklch: okColor,
-      rgb: rgb(clampChroma(okColor, 'rgb')),
-      p3: p3(clampChroma(okColor, 'p3')),
+      rgb: rgb(clampChroma(okColor, 'srgb')),
+      p3: p3(clampChroma(okColor, 'display-p3')),
     }
   }
 }
