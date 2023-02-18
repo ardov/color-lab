@@ -7,11 +7,13 @@ const theme = makeTheme({})
 
 export function Receiver() {
   applyTheme(document.body, theme)
-  const [message, setMessage] = useState<any>()
+  const [message, setMessage] = useState<any>(localStorage.getItem('msg'))
 
   useEffect(() => {
     const getMessage = (e: MessageEvent) => {
+      if (e.origin !== 'https://www.semrush.com') return
       console.log('Get message', e)
+      localStorage.setItem('msg', JSON.stringify(e.data, null, 2))
       setMessage(e.data)
     }
     window.addEventListener('message', getMessage)
