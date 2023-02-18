@@ -5,6 +5,7 @@ import { Themer } from '@/pages/themer'
 import { Splitter } from '@/pages/splitter'
 import { Harmony } from '@/pages/harmony'
 import { P3Space } from '@/pages/p3-space'
+import { Receiver } from '@/pages/receiver'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/p3-space" element={<P3Space />} />
       <Route path="/splitter" element={<Splitter />} />
       <Route path="/harmony" element={<Harmony />} />
+      <Route path="/receiver" element={<Receiver />} />
       <Route path="*" element={<Themer />} />
     </Routes>
   )
