@@ -14,9 +14,10 @@ export function Spaces() {
   const { sceneRef, matrix, setMatrix } = useDragRotation()
   const [transition, setTransition] = useState(0)
   const [mode, setMode] = useState(0)
-  const { divs, size } = useControls('', {
-    divs: { value: 2, min: 1, max: 8, step: 1 },
-    size: { value: 256, min: 100, max: 2000, step: 64 },
+  const { divs, size, perspective } = useControls('', {
+    divs: { value: 3, min: 1, max: 8, step: 1 },
+    perspective: { value: 3000, min: 500, max: 4000, step: 100 },
+    size: { value: 256, min: 100, max: 640, step: 64 },
     ' ': buttonGroup({
       RGB: () => setMode(0),
       OKLAB: () => setMode(1),
@@ -68,10 +69,10 @@ export function Spaces() {
     <div
       className="scene"
       ref={sceneRef}
-
-      // style={{
-      //   transform: `scale(3)`,
-      // }}
+      style={{
+        // @ts-expect-error
+        '--perspective': perspective + 'px',
+      }}
     >
       <div style={{ color: 'white' }} onClick={next}>
         {currentMode.name}
@@ -81,9 +82,9 @@ export function Spaces() {
         style={{
           // @ts-expect-error
           '--size': size + 'px',
-          '--divs': divs,
           transform: `matrix3d(${matrix})`,
           transition: `transform ${transition}ms`,
+          pointerEvents: 'none',
         }}
       >
         {elements}
