@@ -25,6 +25,7 @@
     "apca-w3": "^0.1.9",
     "clsx": "^1.2.1",
     "culori": "github:bijela-gora/culori#types",
+    "leva": "^0.9.34",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.0"
