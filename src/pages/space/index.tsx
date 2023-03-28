@@ -1,7 +1,7 @@
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { pointTo, useDragRotation } from './shared/useDragRotation'
-import { useMemo, useState } from 'react'
-import { useControls } from 'leva'
+import { useCallback, useMemo, useState } from 'react'
+import { buttonGroup, useControls } from 'leva'
 import './styles.css'
 import { add, multiplyNum, position2matrix, substract } from './shared/vectors'
 import { formatCss, lab, oklab, oklch } from 'culori'
@@ -13,10 +13,16 @@ export function Spaces() {
   applyTheme(document.body, theme)
   const { sceneRef, matrix, setMatrix } = useDragRotation()
   const [transition, setTransition] = useState(0)
-  const { divs, mode, size } = useControls('divs', {
+  const [mode, setMode] = useState(0)
+  const { divs, size } = useControls('', {
     divs: { value: 2, min: 1, max: 8, step: 1 },
-    mode: { value: 0, min: 0, max: 3, step: 1 },
     size: { value: 256, min: 100, max: 2000, step: 64 },
+    ' ': buttonGroup({
+      RGB: () => setMode(0),
+      OKLAB: () => setMode(1),
+      OKLrAB: () => setMode(2),
+      LAB: () => setMode(3),
+    }),
   })
 
   const transforms = useMemo(
@@ -43,13 +49,13 @@ export function Spaces() {
         name: 'CIELAB',
         fn: (pos: Pos) => position2matrix(toLabPos(pos), size),
       },
-      {
-        name: 'OKLCH',
-        fn: (pos: Pos) => position2matrix(toOklchPos(pos), size),
-      },
     ],
     [size]
   )
+
+  const next = useCallback(() => {
+    setMode(curr => (curr + 1) % transforms.length)
+  }, [transforms.length])
 
   const currentMode = transforms[mode]
 
@@ -62,11 +68,14 @@ export function Spaces() {
     <div
       className="scene"
       ref={sceneRef}
+
       // style={{
       //   transform: `scale(3)`,
       // }}
     >
-      <div style={{ color: 'white' }}>{currentMode.name}</div>
+      <div style={{ color: 'white' }} onClick={next}>
+        {currentMode.name}
+      </div>
       <div
         className="cube"
         style={{
