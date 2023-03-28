@@ -14,7 +14,7 @@ export function Spaces() {
   const { sceneRef, matrix, setMatrix } = useDragRotation()
   const [transition, setTransition] = useState(0)
   const { divs, mode, size } = useControls('divs', {
-    divs: { value: 2, min: 1, max: 7, step: 1 },
+    divs: { value: 2, min: 1, max: 8, step: 1 },
     mode: { value: 0, min: 0, max: 3, step: 1 },
     size: { value: 256, min: 100, max: 2000, step: 64 },
   })
@@ -72,6 +72,7 @@ export function Spaces() {
         style={{
           // @ts-expect-error
           '--size': size + 'px',
+          '--divs': divs,
           transform: `matrix3d(${matrix})`,
           transition: `transform ${transition}ms`,
         }}

@@ -5,7 +5,7 @@ const { sin, cos, PI } = Math
 type Point = [number, number, number, number]
 
 // prettier-ignore
-type Matrix = [
+export type Matrix = [
   number, number, number, number,
   number, number, number, number,
   number, number, number, number,

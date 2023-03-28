@@ -67,7 +67,7 @@ button:active {
 }
 
 .obj {
-  /* --size: 100px; */
+  --size: 20px;
   /* --color: rgb(255 0 0); */
 
   position: absolute;
