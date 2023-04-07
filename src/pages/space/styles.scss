@@ -78,20 +78,17 @@ button:active {
   top: 0;
   /* clip-path: polygon(0 0, 100% 0%, 0 100%); */
   mask-image: var(--mask);
-  -webkit-mask-image: var(--mask);
-  mask-type: alpha;
   width: var(--size);
   height: var(--size);
   transform-origin: 0% 0%;
   transition: 1500ms ease-in-out;
 
-  /* background: linear-gradient(
-    135deg,
-    var(--color),
-    var(--color-2) 50%,
-    transparent 50%
-  ); */
-  /* background: linear-gradient(135deg, #000, #000 50%, transparent 50%); */
+  // background: linear-gradient(
+  //   135deg,
+  //   var(--color-b),
+  //   var(--color-b) 50%,
+  //   transparent 50%
+  // );
 
   background: radial-gradient(
       farthest-side at 0% 0%,
