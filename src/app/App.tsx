@@ -6,9 +6,8 @@ import { Splitter } from '@/pages/splitter'
 import { Harmony } from '@/pages/harmony'
 import { P3Space } from '@/pages/p3-space'
 import { Receiver } from '@/pages/receiver'
-import { Spaces } from '@/pages/space'
 import { Sliders } from '@/pages/controls'
-import { Spaces2 } from '@/pages/space2'
+import { Spaces } from '@/pages/space'
 
 export default function App() {
   return (
@@ -19,7 +18,6 @@ export default function App() {
       <Route path="/harmony" element={<Harmony />} />
       <Route path="/receiver" element={<Receiver />} />
       <Route path="/spaces" element={<Spaces />} />
-      <Route path="/spaces2" element={<Spaces2 />} />
       <Route path="/sliders" element={<Sliders />} />
       <Route path="*" element={<Themer />} />
     </Routes>

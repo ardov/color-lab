@@ -128,8 +128,7 @@ export class Matrix {
     )
   }
 
-  static fromRotationAxis(axis: Vec3, deg: number): Matrix {
-    const rad = (deg * Math.PI) / 180
+  static fromRotationAxis(axis: Vec3, rad: number): Matrix {
     const c = Math.cos(rad)
     const s = Math.sin(rad)
     const t = 1 - c
@@ -221,6 +220,13 @@ export class Matrix {
       this.m20,     this.m21,     this.m22,     this.m23,
       this.m30 + x, this.m31 + y, this.m32 + z, this.m33
     )
+  }
+
+  rotateByVector(initial: Vec3, target: Vec3): Matrix {
+    const axis = initial.cross(target)
+    const angle = initial.angle(target)
+    const transform = Matrix.fromRotationAxis(axis, angle)
+    return this.mul(transform)
   }
 
   equals(other: Matrix): boolean {

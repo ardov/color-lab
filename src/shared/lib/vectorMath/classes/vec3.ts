@@ -52,6 +52,16 @@ export class Vec3 {
     )
   }
 
+  /** Angle between two vectors in radians */
+  angle(v: Vec3): number {
+    return Math.acos(this.dot(v) / (this.length() * v.length()))
+  }
+
+  /** Angle between two vectors in degrees */
+  angleDeg(v: Vec3): number {
+    return this.angle(v) * (180 / Math.PI)
+  }
+
   /** Length of vector */
   length(): number {
     return Math.sqrt(this.dot(this))

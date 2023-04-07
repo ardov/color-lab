@@ -39,6 +39,27 @@ button:active {
   background: hsl(220deg, 25%, 80%);
 }
 
+.experiment {
+  --size: 40px;
+  --color-a: red;
+  --color-b: green;
+  --color-c: blue;
+
+  width: var(--size);
+  height: var(--size);
+  clip-path: polygon(0 0, 100% 0%, 0 100%);
+  background: radial-gradient(
+      farthest-side at 0% 0%,
+      var(--color-b) 0%,
+      transparent 100%
+    ),
+    conic-gradient(
+      from 90deg at 0% 0%,
+      var(--color-a) 0deg,
+      var(--color-c) 90deg
+    );
+}
+
 .scene {
   width: 100%;
   height: 100vh;
@@ -62,28 +83,47 @@ button:active {
   height: var(--size);
   position: relative;
   transition: 150ms ease-out;
-  transform-origin: 50% 50% var(--half);
+  /* transform-origin: 50% 50% var(--half); */
+  transform-origin: 0px var(--half) 0px;
 }
 
 .obj {
   --size: 20px;
-  /* --color: rgb(255 0 0); */
+  --color-a: red;
+  --color-b: green;
+  --color-c: blue;
+  --mask: linear-gradient(135deg, #000 50.5%, transparent 50.5%);
 
   position: absolute;
   left: 0;
   top: 0;
+  /* clip-path: polygon(0 0, 100% 0%, 0 100%); */
+  mask-image: var(--mask);
+  -webkit-mask-image: var(--mask);
+  mask-type: alpha;
   width: var(--size);
   height: var(--size);
-  /* border: 2px solid red; */
   transform-origin: 0% 0%;
-  /* background: rgb(255 255 0 / 1); */
-  background: linear-gradient(
+  transition: 1500ms ease-in-out;
+
+  /* background: linear-gradient(
     135deg,
     var(--color),
     var(--color-2) 50%,
     transparent 50%
-  );
-  transition: 1500ms ease-in-out;
+  ); */
+  /* background: linear-gradient(135deg, #000, #000 50%, transparent 50%); */
+
+  background: radial-gradient(
+      farthest-side at 0% 0%,
+      var(--color-b) 0%,
+      transparent 75%
+    ),
+    conic-gradient(
+      from 90deg at 0% 0%,
+      var(--color-c) 0deg,
+      var(--color-a) 90deg
+    );
 }
 
 .boundary {

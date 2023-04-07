@@ -24,13 +24,17 @@ export function polygon2matrix(
   const xVec = c.sub(b)
   const yVec = a.sub(b)
   const zVec = yVec.cross(xVec).normalize()
+
   // prettier-ignore
   return new Matrix(
-    xVec.x,     xVec.y,     xVec.z,     0,
-    yVec.x,     yVec.y,     yVec.z,     0,
-    zVec.x,     zVec.y,     zVec.z,     0,
-    b.x * size, b.y * size, b.z * size, 1
-  ).scale(size / POLYGON_SIZE).toCssMatrix()
+    xVec.x, xVec.y, xVec.z, 0,
+    yVec.x, yVec.y, yVec.z, 0,
+    zVec.x, zVec.y, zVec.z, 0,
+    0,      0,      0,      1
+  )
+  .scale(size / POLYGON_SIZE)
+  .translate(b.x * size, b.y * size, b.z * size)
+  .toCssMatrix()
 }
 
 export function makeRgbCube(divs: number) {
@@ -52,6 +56,14 @@ export function makeRgbCube(divs: number) {
     const rightRow = [] as Dot[]
     const topRow = [] as Dot[]
     const bottomRow = [] as Dot[]
+
+    front.push(frontRow)
+    back.push(backRow)
+    left.push(leftRow)
+    right.push(rightRow)
+    top.push(topRow)
+    bottom.push(bottomRow)
+
     for (let j = 0; j <= divs; j++) {
       const frontDot = new Dot(Math.round(i * step), Math.round(j * step), 255)
       const backDot = new Dot(Math.round(i * step), Math.round(j * step), 0)
