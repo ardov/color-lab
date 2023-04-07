@@ -100,18 +100,19 @@ export function Spaces() {
       }}
     >
       <div style={{ color: 'white' }}>{mode}</div>
-      <div
-        className="cube"
-        style={{
-          // @ts-expect-error
-          '--size': size + 'px',
-          transform: matrix.toCssMatrix(),
-          transition: `transform ${transition}ms`,
-          pointerEvents: 'none',
-        }}
-      >
-        {elements}
-        {/* <div
+      <div style={{ transform: 'translateX(50%)' }}>
+        <div
+          className="cube"
+          style={{
+            // @ts-expect-error
+            '--size': size + 'px',
+            transform: matrix.toCssMatrix(),
+            transition: `transform ${transition}ms`,
+            pointerEvents: 'none',
+          }}
+        >
+          {elements}
+          {/* <div
           className="obj"
           style={{
             // transform: matrix,
@@ -122,15 +123,16 @@ export function Spaces() {
           }}
         />
         <div
-          className="obj"
-          style={{
-            transform: 'rotateX(90deg)',
-            // @ts-expect-error
-            '--color': '#ff00ff28',
-            '--color-2': '#ff00ff28',
-            '--size': size + 'px',
-          }}
-        /> */}
+        className="obj"
+        style={{
+          transform: 'rotateX(90deg)',
+          // @ts-expect-error
+          '--color': '#ff00ff28',
+          '--color-2': '#ff00ff28',
+          '--size': size + 'px',
+        }}
+      /> */}
+        </div>
       </div>
     </div>
   )
