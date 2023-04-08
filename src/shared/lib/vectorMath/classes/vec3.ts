@@ -1,4 +1,4 @@
-import { Matrix, Matrix4 } from './matrix'
+import { Matrix } from './matrix'
 
 export class Vec3 {
   constructor(public x: number, public y: number, public z: number) {}

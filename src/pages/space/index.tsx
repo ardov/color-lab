@@ -1,4 +1,3 @@
-import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { useCallback, useMemo, useState } from 'react'
 import { buttonGroup, useControls } from 'leva'
 import './styles.scss'
@@ -6,8 +5,6 @@ import { Matrix } from '@/shared/lib/vectorMath/classes'
 import { useDragRotation2 } from './shared/useDragRotation'
 import { makeRgbCube, polygon2matrix } from './Polygon'
 import { Dot } from './Dot'
-
-const theme = makeTheme({})
 
 // prettier-ignore
 const invertedY = new Matrix(
@@ -19,8 +16,20 @@ const invertedY = new Matrix(
 
 type Mode = keyof Dot['position']
 
+const modes: Mode[] = [
+  'RGB',
+  'OKLAB',
+  'OKLrAB',
+  'LAB',
+  'HSL',
+  'HSV',
+  'OKHSL',
+  'OKHSV',
+  'LRGB',
+]
+
 export function Spaces() {
-  applyTheme(document.body, theme)
+  // applyTheme(document.body, theme)
   const { sceneRef, matrix, setMatrix } = useDragRotation2(invertedY)
   const [transition, setTransition] = useState(0)
   const [mode, setMode] = useState<Mode>('RGB')
@@ -29,12 +38,6 @@ export function Spaces() {
     divs: { value: 3, min: 1, max: 8, step: 1 },
     perspective: { value: 3000, min: 500, max: 4000, step: 100 },
     size: { value: 256, min: 100, max: 640, step: 64 },
-    ' ': buttonGroup({
-      RGB: () => setMode('RGB'),
-      OKLAB: () => setMode('OKLAB'),
-      OKLrAB: () => setMode('OKLrAB'),
-      LAB: () => setMode('LAB'),
-    }),
   })
 
   const transform = useCallback(
@@ -91,28 +94,42 @@ export function Spaces() {
   }, [mode, polygons, size])
 
   return (
-    <div
-      className="scene"
-      ref={sceneRef}
-      style={{
-        // @ts-expect-error
-        '--perspective': perspective + 'px',
-      }}
-    >
-      <div style={{ color: 'white' }}>{mode}</div>
-      <div style={{ transform: 'translateX(50%)' }}>
-        <div
-          className="cube"
-          style={{
-            // @ts-expect-error
-            '--size': size + 'px',
-            transform: matrix.toCssMatrix(),
-            transition: `transform ${transition}ms`,
-            pointerEvents: 'none',
-          }}
-        >
-          {elements}
-          {/* <div
+    <main>
+      <div
+        className="scene"
+        ref={sceneRef}
+        style={{
+          // @ts-expect-error
+          '--perspective': perspective + 'px',
+        }}
+      >
+        <div className="controls">
+          {modes.map(m => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              style={{
+                color: mode === m ? 'white' : 'gray',
+                background: mode === m ? 'black' : 'transparent',
+              }}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+        <div style={{ transform: 'translateX(50%)' }}>
+          <div
+            className="cube"
+            style={{
+              // @ts-expect-error
+              '--size': size + 'px',
+              transform: matrix.toCssMatrix(),
+              transition: `transform ${transition}ms`,
+              pointerEvents: 'none',
+            }}
+          >
+            {elements}
+            {/* <div
           className="obj"
           style={{
             // transform: matrix,
@@ -121,8 +138,8 @@ export function Spaces() {
             '--color-2': '#ffff0028',
             '--size': size + 'px',
           }}
-        />
-        <div
+          />
+          <div
         className="obj"
         style={{
           transform: 'rotateX(90deg)',
@@ -132,8 +149,9 @@ export function Spaces() {
           '--size': size + 'px',
         }}
       /> */}
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

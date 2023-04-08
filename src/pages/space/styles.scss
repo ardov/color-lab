@@ -16,10 +16,15 @@ body {
   gap: 16px;
 }
 
-.controlls {
+.controls {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
   display: flex;
-  gap: 12px;
+  gap: 8px;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
 }
 
