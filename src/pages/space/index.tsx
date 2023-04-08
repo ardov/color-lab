@@ -34,8 +34,8 @@ export function Spaces() {
   const [transition, setTransition] = useState(0)
   const [mode, setMode] = useState<Mode>('RGB')
 
-  const { divs, size, perspective } = useControls('', {
-    divs: { value: 3, min: 1, max: 8, step: 1 },
+  const { cuts, size, perspective } = useControls('', {
+    cuts: { value: 3, min: 1, max: 8, step: 1 },
     perspective: { value: 3000, min: 500, max: 4000, step: 100 },
     size: { value: 256, min: 100, max: 640, step: 64 },
   })
@@ -71,38 +71,24 @@ export function Spaces() {
     }),
   })
 
-  const polygons = useMemo(() => makeRgbCube(divs), [divs])
+  const polygons = useMemo(() => makeRgbCube(cuts), [cuts])
 
   const elements = useMemo(() => {
     return polygons.map(polygon => {
       const id = polygon[0].id + polygon[1].id + polygon[2].id
-      const matrix = polygon2matrix(polygon, mode, size)
-      return (
-        <div
-          key={id}
-          className="obj"
-          style={{
-            transform: matrix,
-            // @ts-expect-error
-            '--color-a': polygon[0].cssColor,
-            '--color-b': polygon[1].cssColor,
-            '--color-c': polygon[2].cssColor,
-          }}
-        />
-      )
+      const style = {
+        '--transform': polygon2matrix(polygon, mode, size),
+        '--color-a': polygon[0].cssColor,
+        '--color-b': polygon[1].cssColor,
+        '--color-c': polygon[2].cssColor,
+      } as React.CSSProperties
+      return <div key={id} className="polygon" style={style} />
     })
   }, [mode, polygons, size])
 
   return (
     <main>
-      <div
-        className="scene"
-        ref={sceneRef}
-        style={{
-          // @ts-expect-error
-          '--perspective': perspective + 'px',
-        }}
-      >
+      <div className="scene" ref={sceneRef}>
         <div className="controls">
           {modes.map(m => (
             <button
@@ -117,7 +103,7 @@ export function Spaces() {
             </button>
           ))}
         </div>
-        <div style={{ transform: 'translateX(50%)' }}>
+        <div style={{ transform: 'translateX(50%)', perspective }}>
           <div
             className="cube"
             style={{
@@ -130,7 +116,7 @@ export function Spaces() {
           >
             {elements}
             {/* <div
-          className="obj"
+          className="polygon"
           style={{
             // transform: matrix,
             // @ts-expect-error
@@ -140,7 +126,7 @@ export function Spaces() {
           }}
           />
           <div
-        className="obj"
+        className="polygon"
         style={{
           transform: 'rotateX(90deg)',
           // @ts-expect-error

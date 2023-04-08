@@ -71,35 +71,25 @@ button:active {
   transform-origin: 0px var(--half) 0px;
 }
 
-.obj {
+.polygon {
   --size: 20px;
+  --transform: none;
   --color-a: red;
   --color-b: green;
   --color-c: blue;
-  --mask: linear-gradient(135deg, #000 50.5%, transparent 50.5%);
 
   position: absolute;
   left: 0;
   top: 0;
   /* clip-path: polygon(0 0, 100% 0%, 0 100%); */
-  mask-image: var(--mask);
+  mask-image: linear-gradient(135deg, #000 50.5%, transparent 50.5%);
   width: var(--size);
   height: var(--size);
   transform-origin: 0% 0%;
   transition: 1500ms ease-in-out;
+  transform: var(--transform);
 
-  // background: linear-gradient(
-  //   135deg,
-  //   var(--color-b),
-  //   var(--color-b) 50%,
-  //   transparent 50%
-  // );
-
-  background: radial-gradient(
-      farthest-side at 0% 0%,
-      var(--color-b) 0%,
-      transparent 75%
-    ),
+  background: linear-gradient(135deg, var(--color-b), transparent 50%),
     conic-gradient(
       from 90deg at 0% 0%,
       var(--color-c) 0deg,
