@@ -18,6 +18,7 @@ export const Button: FC<ButtonProps> = props => {
     ...delegated
   } = props
   return (
+    // @ts-expect-error Some problem with three.js types
     <Wrapper
       className={clsx(
         classes.root,
