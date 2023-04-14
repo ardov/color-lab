@@ -1866,6 +1866,11 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.4.tgz#e913e8175db8307d78b4e8fa690408ba6b65dee4"
   integrity sha512-KnRanxnpfpjUTqTCXslZSEdLfXExwgNxYPdiO2WGUj8+HDjFi8R3k5RVKPeSCzLjCcshCAtVO2QBbVuAV4kTnw==
 
+"@types/culori@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/culori/-/culori-2.0.0.tgz#35d6f2646a2e98bc9d7a41c19e3f31e7efd2fea5"
+  integrity sha512-bKpEra39sQS9UZ+1JoWhuGJEzwKS0dUkNCohVYmn6CAEBkqyIXimKiPDRZWtiOB7sKgkWMaTUpHFimygRoGIlg==
+
 "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
@@ -2675,9 +2680,10 @@ csstype@^3.0.2, csstype@^3.0.4:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.1.tgz#841b532c45c758ee546a11d5bd7b7b473c8c30b9"
   integrity sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==
 
-"culori@github:bijela-gora/culori#types":
-  version "2.0.3"
-  resolved "https://codeload.github.com/bijela-gora/culori/tar.gz/d810061011de6d12e7c01164ba01d892952e575b"
+culori@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/culori/-/culori-3.1.0.tgz#dc7922c1b7df563c6a1d3ddd56c5c869d0a50f9d"
+  integrity sha512-UfE5Cz+Hy67GljfCTobMeEyOd8EfUk0Gd32N4ZrpzgWBssJEkFDg917t0CM5g1yK7MqB7MBneJfh2maIHjBrFQ==
 
 damerau-levenshtein@^1.0.8:
   version "1.0.8"
