@@ -17,6 +17,11 @@ import { betterToe } from '@/shared/lib/huevo'
 import { Box, Cylinder, Plane } from '@react-three/drei'
 import { useEffect, useRef } from 'react'
 
+const invertedX = () =>
+  new THREE.Matrix4().fromArray([
+    -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+  ])
+
 type SpaceObj = {
   name: string
   mx?: THREE.Matrix4
@@ -31,7 +36,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'HSL',
-    mx: new THREE.Matrix4().makeRotationY(rad(-28)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(-28))),
     fn: color => {
       const { h, s, l } = hsl(color)
       return [Math.cos(rad(h)) * s, l, Math.sin(rad(h)) * s]
@@ -39,7 +44,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'OKHSL',
-    mx: new THREE.Matrix4().makeRotationY(rad(20)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(20))),
     fn: color => {
       const { h, s, l } = okhsl(color)
       return [Math.cos(rad(h)) * s, l, Math.sin(rad(h)) * s]
@@ -47,7 +52,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'HSV',
-    mx: new THREE.Matrix4().makeRotationY(rad(-28)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(-28))),
     fn: color => {
       const { h, s, v } = hsv(color)
       return [Math.cos(rad(h)) * s, v, Math.sin(rad(h)) * s]
@@ -55,7 +60,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'OKHSV',
-    mx: new THREE.Matrix4().makeRotationY(rad(20)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(20))),
     fn: color => {
       const { h, s, v } = okhsv(color)
       return [Math.cos(rad(h)) * s, v, Math.sin(rad(h)) * s]
@@ -63,7 +68,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'OKLAB',
-    mx: new THREE.Matrix4().makeRotationY(rad(18)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(18))),
     fn: color => {
       const { l, a, b } = oklab(color)
       return [a, l, b]
@@ -71,7 +76,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'OKLrAB',
-    mx: new THREE.Matrix4().makeRotationY(rad(18)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(18))),
     fn: color => {
       const { l, a, b } = oklab(color)
       return [a, betterToe(l), b]
@@ -79,7 +84,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'LAB',
-    mx: new THREE.Matrix4().makeRotationY(rad(9)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
     fn: color => {
       const { l, a, b } = lab(color)
       return [a / 100, l / 100, b / 100]
@@ -87,7 +92,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'CIELuv',
-    mx: new THREE.Matrix4().makeRotationY(rad(-5)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(-5))),
     fn: color => {
       const { l, u, v } = luv(color)
       return [u / 100, l / 100, v / 100]
@@ -95,7 +100,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'DIN99 Lab',
-    mx: new THREE.Matrix4().makeRotationY(rad(9)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
     fn: color => {
       const { l, a, b } = dlab(color)
       return [a / 100, l / 100, b / 100]
@@ -103,7 +108,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'Jab',
-    mx: new THREE.Matrix4().makeRotationY(rad(9)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
     fn: color => {
       const { j, a, b } = jab(color)
       const m = 1 / 0.222
@@ -112,7 +117,7 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'YIQ',
-    mx: new THREE.Matrix4().makeRotationY(rad(45)),
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(45))),
     fn: color => {
       const { y, i, q } = yiq(color)
       return [q, y, i]
@@ -199,7 +204,7 @@ export function Boundary(props: BoundaryProps) {
 function getRgbMatrix() {
   const s = 1 / Math.sqrt(3)
   return new THREE.Matrix4()
-    .fromArray([-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+    .identity()
     .multiply(new THREE.Matrix4().makeScale(s, s, s))
     .multiply(new THREE.Matrix4().makeRotationY(rad(180)))
     .multiply(new THREE.Matrix4().makeRotationX(rad(-35)))
@@ -208,7 +213,7 @@ function getRgbMatrix() {
 
 function getXyzMatrix() {
   return new THREE.Matrix4()
-    .fromArray([-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+    .identity()
     .multiply(new THREE.Matrix4().makeTranslation(0.36, 0, -0.08))
     .multiply(new THREE.Matrix4().makeRotationY(rad(-146)))
     .multiply(new THREE.Matrix4().makeTranslation(0, 0, 0.5))
