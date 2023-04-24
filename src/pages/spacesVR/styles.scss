@@ -1,0 +1,46 @@
+.main {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #171a29;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 12px;
+  gap: 8px;
+}
+
+.current {
+  // font-weight: 900;
+  // color: black;
+  background-color: white;
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 12px;
+  gap: 8px;
+}
+
+.slider {
+  // width: 100%;
+  max-width: 320px;
+}
+
+.canvas {
+  width: 100%;
+  flex-grow: 1;
+}

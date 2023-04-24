@@ -9,6 +9,7 @@ import { Receiver } from '@/pages/receiver'
 import { Sliders } from '@/pages/controls'
 import { Spaces } from '@/pages/space'
 import { Spaces3d } from '@/pages/spaces3d'
+import { SpacesVR } from '@/pages/spacesVR'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 
 const theme = makeTheme({
@@ -27,6 +28,7 @@ export default function App() {
       <Route path="/receiver" element={<Receiver />} />
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/spaces-3d" element={<Spaces3d />} />
+      <Route path="/spaces-vr" element={<SpacesVR />} />
       <Route path="/sliders" element={<Sliders />} />
       <Route path="*" element={<Themer />} />
     </Routes>

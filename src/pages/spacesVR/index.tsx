@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
+import { VRButton, ARButton, XR, Controllers, Hands } from '@react-three/xr'
 import {
   Box,
   CameraControls,
@@ -14,7 +15,7 @@ import { Slider } from '@/shared/ui/Slider'
 import { Button } from '@/shared/ui/Button'
 import { makeIndicatorGeometry, makePlaneGeometry } from './gamuts'
 
-export function Spaces3d() {
+export function SpacesVR() {
   const { segments, wireframe, boundary, perspective } = useControls(
     'Display',
     {
@@ -136,67 +137,70 @@ export function Spaces3d() {
           style={{ width: 400 }}
         />
       </div>
-
+      <VRButton />
       <main className="canvas">
         <Canvas flat linear>
-          <CameraControls makeDefault />
-          <PerspectiveCamera position={[0, 0, 2]} makeDefault={perspective} />
-          <OrthographicCamera
-            position={[0, 0, 2]}
-            zoom={350}
-            makeDefault={!perspective}
-          />
+          <XR>
+            <Controllers />
+            <Hands />
+            <CameraControls makeDefault />
+            <PerspectiveCamera position={[0, 0, 2]} makeDefault={perspective} />
+            <OrthographicCamera
+              position={[0, 0, 2]}
+              zoom={350}
+              makeDefault={!perspective}
+            />
 
-          {/* <Box
+            {/* <Box
             args={[0.1, 0.1, 0.1]}
             material={new THREE.MeshNormalMaterial()}
             position={selectedPoint?.toArray() || [0, 0, 0]}
           /> */}
 
-          <group position={[0, -0.5, 0]}>
-            <mesh
-              onClick={e => setSelectedPoint(e.point)}
-              geometry={rgbGeometry2}
-              material={
-                new THREE.MeshBasicMaterial({
-                  side: THREE.DoubleSide,
-                  vertexColors: true,
-                  wireframe,
-                })
-              }
-              morphTargetInfluences={morphTargetInfluences}
-            />
-
-            <mesh
-              onClick={e => setSelectedPoint(e.point)}
-              geometry={grayGeometry}
-              material={
-                new THREE.MeshBasicMaterial({
-                  side: THREE.DoubleSide,
-                  vertexColors: true,
-                  wireframe,
-                })
-              }
-              morphTargetInfluences={morphTargetInfluences}
-            />
-            {show && (
+            <group position={[0, -0.5, 0]}>
               <mesh
-                geometry={indicatorGeometry}
+                onClick={e => setSelectedPoint(e.point)}
+                geometry={rgbGeometry2}
                 material={
                   new THREE.MeshBasicMaterial({
+                    side: THREE.DoubleSide,
                     vertexColors: true,
+                    wireframe,
                   })
                 }
                 morphTargetInfluences={morphTargetInfluences}
               />
-            )}
-            {boundary && (
-              <Boundary
-                type={spaces[currentSpace].boundary}
-                mx={spaces[currentSpace].mx}
+
+              <mesh
+                onClick={e => setSelectedPoint(e.point)}
+                geometry={grayGeometry}
+                material={
+                  new THREE.MeshBasicMaterial({
+                    side: THREE.DoubleSide,
+                    vertexColors: true,
+                    wireframe,
+                  })
+                }
+                morphTargetInfluences={morphTargetInfluences}
               />
-            )}
-            {/* <mesh
+              {show && (
+                <mesh
+                  geometry={indicatorGeometry}
+                  material={
+                    new THREE.MeshBasicMaterial({
+                      vertexColors: true,
+                    })
+                  }
+                  morphTargetInfluences={morphTargetInfluences}
+                />
+              )}
+              {boundary && (
+                <Boundary
+                  type={spaces[currentSpace].boundary}
+                  mx={spaces[currentSpace].mx}
+                />
+              )}
+              {/* <mesh
               onClick={e => setSelectedPoint(e.point)}
               geometry={rgbGeometry}
               material={
@@ -209,29 +213,30 @@ export function Spaces3d() {
               morphTargetInfluences={morphTargetInfluences}
             /> */}
 
-            {P3 && (
-              <mesh
-                geometry={p3Geometry}
-                material={secondaryMaterial}
-                morphTargetInfluences={morphTargetInfluences}
-              />
-            )}
-            {Rec2020 && (
-              <mesh
-                geometry={rec2020Geometry}
-                material={secondaryMaterial}
-                morphTargetInfluences={morphTargetInfluences}
-              />
-            )}
-            {Prophoto && (
-              <mesh
-                geometry={prophotoGeometry}
-                material={secondaryMaterial}
-                morphTargetInfluences={morphTargetInfluences}
-              />
-            )}
-          </group>
-          {/* <axesHelper args={[1]} /> */}
+              {P3 && (
+                <mesh
+                  geometry={p3Geometry}
+                  material={secondaryMaterial}
+                  morphTargetInfluences={morphTargetInfluences}
+                />
+              )}
+              {Rec2020 && (
+                <mesh
+                  geometry={rec2020Geometry}
+                  material={secondaryMaterial}
+                  morphTargetInfluences={morphTargetInfluences}
+                />
+              )}
+              {Prophoto && (
+                <mesh
+                  geometry={prophotoGeometry}
+                  material={secondaryMaterial}
+                  morphTargetInfluences={morphTargetInfluences}
+                />
+              )}
+            </group>
+            {/* <axesHelper args={[1]} /> */}
+          </XR>
         </Canvas>
       </main>
     </div>
