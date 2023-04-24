@@ -1,4 +1,4 @@
-import { betterToe } from '@/shared/lib/huevo'
+import { betterToe } from '@/shared/lib/huelab'
 import { Matrix, Vec3 } from '@/shared/lib/vectorMath/classes'
 import { Rgb, hsl, hsv, lab, lrgb, okhsl, okhsv, oklab } from 'culori'
 

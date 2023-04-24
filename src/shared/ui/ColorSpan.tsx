@@ -1,6 +1,6 @@
 import { Color, formatHex8, parse, rgb, Rgb } from 'culori'
 import { ReactNode } from 'react'
-import { getContrastColor } from '../lib/huevo'
+import { getContrastColor } from '../lib/huelab'
 
 export function ColorSpan(props: {
   value: Color | string

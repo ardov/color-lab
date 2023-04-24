@@ -6,14 +6,17 @@ import {
   hsv,
   jab,
   lab,
+  lch,
   luv,
   okhsl,
   okhsv,
   oklab,
+  oklch,
+  rgb,
   xyz50,
   yiq,
 } from 'culori'
-import { betterToe } from '@/shared/lib/huevo'
+import { betterToe } from '@/shared/lib/huelab'
 import { Box, Cylinder, Plane } from '@react-three/drei'
 import { useEffect, useRef } from 'react'
 
@@ -26,13 +29,16 @@ type SpaceObj = {
   name: string
   mx?: THREE.Matrix4
   boundary?: BoundaryType
-  fn: (color: Rgb) => [number, number, number]
+  fn: (color: Rgb, ref?: Rgb | number) => [number, number, number]
 }
 export const spaces: SpaceObj[] = [
   {
     name: 'sRGB',
     mx: getRgbMatrix(),
-    fn: color => [color.r, color.g, color.b],
+    fn: color => {
+      const { r, g, b } = rgb(color)
+      return [r, g, b]
+    },
   },
   {
     name: 'HSL',
@@ -83,11 +89,50 @@ export const spaces: SpaceObj[] = [
     },
   },
   {
+    name: 'OKLrCH',
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(18))),
+    fn: (color, ref) => {
+      const { l, c, h } = oklch(color)
+      const lr = 1 - betterToe(l)
+
+      const getAngle = () => {
+        if (typeof ref === 'number') return ref
+        if (ref) return oklch(ref).h || 0
+        return h || 0
+      }
+
+      const angle = getAngle()
+      return [Math.cos(rad(angle)) * lr, c, Math.sin(rad(angle)) * lr]
+    },
+  },
+  {
     name: 'LAB',
     mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
     fn: color => {
       const { l, a, b } = lab(color)
       return [a / 100, l / 100, b / 100]
+    },
+  },
+  {
+    name: 'LCH',
+    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
+    fn: (color, ref) => {
+      const { l, c, h } = lch(color)
+      const lightness = 1 - l / 100
+
+      const getAngle = () => {
+        if (typeof ref === 'number') return ref
+        if (ref) return oklch(ref).h || 0
+        return h || 0
+      }
+
+      const angle = getAngle()
+
+      return [
+        Math.cos(rad(angle)) * lightness,
+        c / 100,
+        Math.sin(rad(angle)) * lightness,
+      ]
     },
   },
   {
@@ -128,19 +173,14 @@ export const spaces: SpaceObj[] = [
     mx: getXyzMatrix(),
     boundary: 'unitBox',
     fn: color => {
+      if (color.r === 0 && color.g === 0 && color.b === 0) {
+        const { x, y, z } = xyz50({ mode: 'rgb', r: 1, g: 1, b: 1 })
+        const sum = x + y + z
+        return [x / sum, y / sum, 0]
+      }
       const { x, y, z } = xyz50(color)
       const sum = x + y + z
       return [x / sum, y / sum, y]
-    },
-  },
-  {
-    name: 'CIE xy',
-    mx: getXyzMatrix(),
-    boundary: 'planeXY',
-    fn: color => {
-      const { x, y, z } = xyz50(color)
-      const sum = x + y + z
-      return [x / sum, y / sum, 0]
     },
   },
 ]

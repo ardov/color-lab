@@ -1,4 +1,4 @@
-import { betterToe, betterToeInv, RGBA } from '@/shared/lib/huevo'
+import { betterToe, betterToeInv, RGBA } from '@/shared/lib/huelab'
 import { colorScale } from '@/shared/lib/math/colorScale'
 import { Color, Oklch, P3, p3, Rgb, rgb } from 'culori'
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'

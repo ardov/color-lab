@@ -4,7 +4,7 @@ import {
   fromRGBA,
   RGBA,
   toRGBA,
-} from '@/shared/lib/huevo'
+} from '@/shared/lib/huelab'
 import { clampRgb, Oklch, oklch } from 'culori'
 
 export type TShader = (

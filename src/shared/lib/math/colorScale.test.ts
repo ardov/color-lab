@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { RGBA } from '../huevo'
+import { RGBA } from '../huelab'
 import { colorScale } from './colorScale'
 
 test('colorScale', () => {

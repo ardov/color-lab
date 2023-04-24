@@ -12,7 +12,11 @@ import './styles.scss'
 import { spaces, Boundary } from './spaces'
 import { Slider } from '@/shared/ui/Slider'
 import { Button } from '@/shared/ui/Button'
-import { makeCubeGeometry } from './gamuts'
+import {
+  makeCubeGeometry,
+  makeIndicatorGeometry,
+  makePlaneGeometry,
+} from './gamuts'
 
 export function Spaces3d() {
   const { segments, wireframe, boundary, perspective } = useControls(
@@ -21,7 +25,7 @@ export function Spaces3d() {
       perspective: true,
       wireframe: false,
       boundary: false,
-      segments: { value: 24, min: 1, max: 32, step: 4 },
+      segments: { value: 48, min: 6, max: 120, step: 12 },
     }
   )
   const { P3, Rec2020, Prophoto, opacity } = useControls('Secondary', {
@@ -29,6 +33,10 @@ export function Spaces3d() {
     Rec2020: false,
     Prophoto: false,
     opacity: { value: 0.2, min: 0, max: 1, step: 0.1 },
+  })
+  const { color, show } = useControls('Color', {
+    show: true,
+    color: { r: 200, b: 125, g: 106 },
   })
   const [fromTo, setFromTo] = useState([0, 0] as [number, number])
   const [progress, setProgress] = useState(1)
@@ -46,6 +54,8 @@ export function Spaces3d() {
       })
     })
   }, [])
+
+  const [selectedPoint, setSelectedPoint] = useState<THREE.Vector3 | null>(null)
 
   const currentSpace = progress < 0.5 ? fromTo[0] : fromTo[1]
 
@@ -71,17 +81,26 @@ export function Spaces3d() {
     [fromTo, interpolate]
   )
 
-  const rgbGeometry = useMemo(
-    () => makeCubeGeometry('rgb', segments),
+  const indicatorGeometry = useMemo(() => makeIndicatorGeometry(color), [color])
+
+  const rgbGeometry2 = useMemo(
+    () => makePlaneGeometry('rgb', segments, 1),
     [segments]
   )
-  const p3Geometry = useMemo(() => makeCubeGeometry('p3', segments), [segments])
+  const grayGeometry = useMemo(
+    () => makePlaneGeometry('rgb', segments, 0),
+    [segments]
+  )
+  const p3Geometry = useMemo(
+    () => makePlaneGeometry('p3', segments),
+    [segments]
+  )
   const rec2020Geometry = useMemo(
-    () => makeCubeGeometry('rec2020', segments),
+    () => makePlaneGeometry('rec2020', segments),
     [segments]
   )
   const prophotoGeometry = useMemo(
-    () => makeCubeGeometry('prophoto', segments),
+    () => makePlaneGeometry('prophoto', segments),
     [segments]
   )
 
@@ -122,16 +141,7 @@ export function Spaces3d() {
         />
       </div>
       <main className="canvas">
-        <Canvas
-          flat
-          linear
-          // camera={{
-          //   fov: 75,
-          //   near: 0.1,
-          //   far: 1000,
-          //   position: [0, 0, 2],
-          // }}
-        >
+        <Canvas flat linear>
           <CameraControls makeDefault />
           <PerspectiveCamera position={[0, 0, 2]} makeDefault={perspective} />
           <OrthographicCamera
@@ -139,23 +149,17 @@ export function Spaces3d() {
             zoom={350}
             makeDefault={!perspective}
           />
+
           {/* <Box
-            args={[1, 1, 1]}
-            material={
-              new THREE.MeshBasicMaterial({
-                wireframe: true,
-              })
-            }
+            args={[0.1, 0.1, 0.1]}
+            material={new THREE.MeshNormalMaterial()}
+            position={selectedPoint?.toArray() || [0, 0, 0]}
           /> */}
+
           <group position={[0, -0.5, 0]}>
-            {boundary && (
-              <Boundary
-                type={spaces[currentSpace].boundary}
-                mx={spaces[currentSpace].mx}
-              />
-            )}
             <mesh
-              geometry={rgbGeometry}
+              onClick={e => setSelectedPoint(e.point)}
+              geometry={rgbGeometry2}
               material={
                 new THREE.MeshBasicMaterial({
                   side: THREE.DoubleSide,
@@ -165,6 +169,49 @@ export function Spaces3d() {
               }
               morphTargetInfluences={morphTargetInfluences}
             />
+
+            <mesh
+              onClick={e => setSelectedPoint(e.point)}
+              geometry={grayGeometry}
+              material={
+                new THREE.MeshBasicMaterial({
+                  side: THREE.DoubleSide,
+                  vertexColors: true,
+                  wireframe,
+                })
+              }
+              morphTargetInfluences={morphTargetInfluences}
+            />
+            {show && (
+              <mesh
+                geometry={indicatorGeometry}
+                material={
+                  new THREE.MeshBasicMaterial({
+                    vertexColors: true,
+                  })
+                }
+                morphTargetInfluences={morphTargetInfluences}
+              />
+            )}
+            {boundary && (
+              <Boundary
+                type={spaces[currentSpace].boundary}
+                mx={spaces[currentSpace].mx}
+              />
+            )}
+            {/* <mesh
+              onClick={e => setSelectedPoint(e.point)}
+              geometry={rgbGeometry}
+              material={
+                new THREE.MeshBasicMaterial({
+                  side: THREE.DoubleSide,
+                  vertexColors: true,
+                  wireframe,
+                })
+              }
+              morphTargetInfluences={morphTargetInfluences}
+            /> */}
+
             {P3 && (
               <mesh
                 geometry={p3Geometry}

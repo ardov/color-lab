@@ -1,4 +1,4 @@
-import { RGBA } from '@/shared/lib/huevo'
+import { RGBA } from '@/shared/lib/huelab'
 
 /**
  * Set of pixels with convenient interface

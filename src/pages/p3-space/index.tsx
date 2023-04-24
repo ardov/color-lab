@@ -4,7 +4,7 @@ import {
   clampChroma,
   displayable,
   RGBA,
-} from '@/shared/lib/huevo'
+} from '@/shared/lib/huelab'
 import { remap } from '@/shared/lib/math'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { Slider } from '@/shared/ui/Slider'

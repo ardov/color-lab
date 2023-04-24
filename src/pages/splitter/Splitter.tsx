@@ -1,4 +1,4 @@
-import { RGBA } from '@/shared/lib/huevo'
+import { RGBA } from '@/shared/lib/huelab'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'
 import { Stack } from '@/shared/ui/Stack'

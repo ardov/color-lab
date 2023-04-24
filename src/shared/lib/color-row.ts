@@ -1,5 +1,5 @@
 import { Oklch } from 'culori'
-import { clampChroma, getContrastColor } from './huevo'
+import { clampChroma, getContrastColor } from './huelab'
 
 type TLRule =
   | number

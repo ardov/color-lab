@@ -4,7 +4,7 @@ import {
   betterToeInv,
   clampChroma,
   getContrastColor,
-} from '../huevo'
+} from '../huelab'
 import { keys, entries } from '@/shared/types'
 
 type TValue = number | { light: number; dark: number }

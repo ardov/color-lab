@@ -1,4 +1,4 @@
-import { clampChroma } from '@/shared/lib/huevo'
+import { clampChroma } from '@/shared/lib/huelab'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { entries } from '@/shared/types'
 import { ColorSpan } from '@/shared/ui/ColorSpan'

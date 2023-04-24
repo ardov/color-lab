@@ -6,7 +6,7 @@ import { Stack } from '@/shared/ui/Stack/Stack'
 import { entries } from '@/shared/types'
 import { Slider } from '@/shared/ui/Slider'
 import { Tooltip } from '@/shared/ui/Tooltip'
-import { getContrastColor } from '@/shared/lib/huevo'
+import { getContrastColor } from '@/shared/lib/huelab'
 
 export function ThemeProvider(props: {
   theme: 'dark' | 'light'
