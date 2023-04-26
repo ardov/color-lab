@@ -1,7 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
-import { VRButton, ARButton, XR, Controllers, Hands } from '@react-three/xr'
+import {
+  VRButton,
+  ARButton,
+  XR,
+  Controllers,
+  Hands,
+  RayGrab,
+} from '@react-three/xr'
 import {
   Box,
   CameraControls,
@@ -157,50 +164,51 @@ export function SpacesVR() {
             position={selectedPoint?.toArray() || [0, 0, 0]}
           /> */}
 
-            <group position={[0, -0.5, 0]}>
-              <mesh
-                onClick={e => setSelectedPoint(e.point)}
-                geometry={rgbGeometry2}
-                material={
-                  new THREE.MeshBasicMaterial({
-                    side: THREE.DoubleSide,
-                    vertexColors: true,
-                    wireframe,
-                  })
-                }
-                morphTargetInfluences={morphTargetInfluences}
-              />
-
-              <mesh
-                onClick={e => setSelectedPoint(e.point)}
-                geometry={grayGeometry}
-                material={
-                  new THREE.MeshBasicMaterial({
-                    side: THREE.DoubleSide,
-                    vertexColors: true,
-                    wireframe,
-                  })
-                }
-                morphTargetInfluences={morphTargetInfluences}
-              />
-              {show && (
+            <RayGrab>
+              <group position={[-0.5, 0.5, 0]} scale={[0.5, 0.5, 0.5]}>
                 <mesh
-                  geometry={indicatorGeometry}
+                  onClick={e => setSelectedPoint(e.point)}
+                  geometry={rgbGeometry2}
                   material={
                     new THREE.MeshBasicMaterial({
+                      side: THREE.DoubleSide,
                       vertexColors: true,
+                      wireframe,
                     })
                   }
                   morphTargetInfluences={morphTargetInfluences}
                 />
-              )}
-              {boundary && (
-                <Boundary
-                  type={spaces[currentSpace].boundary}
-                  mx={spaces[currentSpace].mx}
+
+                <mesh
+                  onClick={e => setSelectedPoint(e.point)}
+                  geometry={grayGeometry}
+                  material={
+                    new THREE.MeshBasicMaterial({
+                      side: THREE.DoubleSide,
+                      vertexColors: true,
+                      wireframe,
+                    })
+                  }
+                  morphTargetInfluences={morphTargetInfluences}
                 />
-              )}
-              {/* <mesh
+                {show && (
+                  <mesh
+                    geometry={indicatorGeometry}
+                    material={
+                      new THREE.MeshBasicMaterial({
+                        vertexColors: true,
+                      })
+                    }
+                    morphTargetInfluences={morphTargetInfluences}
+                  />
+                )}
+                {boundary && (
+                  <Boundary
+                    type={spaces[currentSpace].boundary}
+                    mx={spaces[currentSpace].mx}
+                  />
+                )}
+                {/* <mesh
               onClick={e => setSelectedPoint(e.point)}
               geometry={rgbGeometry}
               material={
@@ -213,28 +221,29 @@ export function SpacesVR() {
               morphTargetInfluences={morphTargetInfluences}
             /> */}
 
-              {P3 && (
-                <mesh
-                  geometry={p3Geometry}
-                  material={secondaryMaterial}
-                  morphTargetInfluences={morphTargetInfluences}
-                />
-              )}
-              {Rec2020 && (
-                <mesh
-                  geometry={rec2020Geometry}
-                  material={secondaryMaterial}
-                  morphTargetInfluences={morphTargetInfluences}
-                />
-              )}
-              {Prophoto && (
-                <mesh
-                  geometry={prophotoGeometry}
-                  material={secondaryMaterial}
-                  morphTargetInfluences={morphTargetInfluences}
-                />
-              )}
-            </group>
+                {P3 && (
+                  <mesh
+                    geometry={p3Geometry}
+                    material={secondaryMaterial}
+                    morphTargetInfluences={morphTargetInfluences}
+                  />
+                )}
+                {Rec2020 && (
+                  <mesh
+                    geometry={rec2020Geometry}
+                    material={secondaryMaterial}
+                    morphTargetInfluences={morphTargetInfluences}
+                  />
+                )}
+                {Prophoto && (
+                  <mesh
+                    geometry={prophotoGeometry}
+                    material={secondaryMaterial}
+                    morphTargetInfluences={morphTargetInfluences}
+                  />
+                )}
+              </group>
+            </RayGrab>
             {/* <axesHelper args={[1]} /> */}
           </XR>
         </Canvas>
