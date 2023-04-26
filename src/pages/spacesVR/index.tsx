@@ -85,6 +85,10 @@ export function SpacesVR() {
     [fromTo, interpolate]
   )
 
+  const goNext = useCallback(() => {
+    goTo((currentSpace + 1) % spaces.length)
+  }, [currentSpace, goTo])
+
   const indicatorGeometry = useMemo(() => makeIndicatorGeometry(color), [color])
 
   const rgbGeometry2 = useMemo(
@@ -165,9 +169,9 @@ export function SpacesVR() {
           /> */}
 
             <RayGrab>
-              <group position={[-0.5, 0.5, 0]} scale={[0.5, 0.5, 0.5]}>
+              <group position={[0, 1, 0]} scale={[0.2, 0.2, 0.2]}>
                 <mesh
-                  onClick={e => setSelectedPoint(e.point)}
+                  onClick={e => goNext()}
                   geometry={rgbGeometry2}
                   material={
                     new THREE.MeshBasicMaterial({
@@ -180,7 +184,6 @@ export function SpacesVR() {
                 />
 
                 <mesh
-                  onClick={e => setSelectedPoint(e.point)}
                   geometry={grayGeometry}
                   material={
                     new THREE.MeshBasicMaterial({
