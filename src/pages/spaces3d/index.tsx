@@ -32,18 +32,26 @@ export function Spaces3d() {
     },
     { collapsed: true }
   )
-  const { sRGB, P3, Rec2020, Prophoto, opacity } = useControls('Gamuts', {
-    sRGB: true,
-    P3: false,
-    Rec2020: false,
-    Prophoto: false,
-    opacity: { value: 0.2, min: 0, max: 1, step: 0.1 },
-  })
-  const { colorA, colorB, show } = useControls('Gradient', {
-    show: false,
-    colorA: { r: 255, b: 0, g: 0 },
-    colorB: { r: 255, b: 255, g: 0 },
-  })
+  const { sRGB, P3, Rec2020, Prophoto, opacity } = useControls(
+    'Gamuts',
+    {
+      sRGB: true,
+      P3: false,
+      Rec2020: false,
+      Prophoto: false,
+      opacity: { value: 0.2, min: 0, max: 1, step: 0.1 },
+    },
+    { collapsed: true }
+  )
+  const { colorA, colorB, show } = useControls(
+    'Gradient',
+    {
+      show: false,
+      colorA: { r: 255, b: 0, g: 0 },
+      colorB: { r: 255, b: 255, g: 0 },
+    },
+    { collapsed: true }
+  )
 
   const [selectedPoint, setSelectedPoint] = useState<THREE.Vector3 | null>(null)
 
