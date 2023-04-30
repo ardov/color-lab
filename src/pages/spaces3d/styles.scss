@@ -8,6 +8,18 @@
   background-color: #171a29;
 }
 
+.ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  overflow: hidden;
+  background-color: #171a2960;
+  backdrop-filter: blur(6px);
+  z-index: 1;
+}
+
 .buttons {
   display: flex;
   flex-direction: row;

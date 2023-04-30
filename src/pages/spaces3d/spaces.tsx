@@ -1,17 +1,21 @@
 import * as THREE from 'three'
 import {
+  Mode,
   Rgb,
   dlab,
+  dlch,
   hsl,
   hsv,
   jab,
   lab,
   lch,
+  lchuv,
   luv,
   okhsl,
   okhsv,
   oklab,
   oklch,
+  p3,
   rgb,
   xyz50,
   yiq,
@@ -20,20 +24,27 @@ import { betterToe } from '@/shared/lib/huelab'
 import { Box, Cylinder, Plane } from '@react-three/drei'
 import { useEffect, useRef } from 'react'
 
-const invertedX = () =>
-  new THREE.Matrix4().fromArray([
-    -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-  ])
+const colorToAlign: Rgb = { mode: 'rgb', r: 1, g: 1, b: 0 }
+
+type BoundaryType = 'unitBox' | 'planeXY' | 'cylinder'
 
 type SpaceObj = {
+  /** Unique color space name */
   name: string
+  /** Culori mode */
+  mode: Mode
+  /** Matrix to align the space with others */
   mx?: THREE.Matrix4
+  /** Space limits */
   boundary?: BoundaryType
+  /** Function to convert color to 3D coordinates */
   fn: (color: Rgb, ref?: Rgb | number) => [number, number, number]
 }
+
 export const spaces: SpaceObj[] = [
   {
     name: 'sRGB',
+    mode: 'rgb',
     mx: getRgbMatrix(),
     fn: color => {
       const { r, g, b } = rgb(color)
@@ -42,55 +53,71 @@ export const spaces: SpaceObj[] = [
   },
   {
     name: 'HSL',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(-28))),
+    mode: 'hsl',
+    mx: alignToHue(hsl(colorToAlign).h),
     fn: color => {
       const { h, s, l } = hsl(color)
-      return [Math.cos(rad(h)) * s, l, Math.sin(rad(h)) * s]
-    },
-  },
-  {
-    name: 'OKHSL',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(20))),
-    fn: color => {
-      const { h, s, l } = okhsl(color)
-      return [Math.cos(rad(h)) * s, l, Math.sin(rad(h)) * s]
+      return [Math.sin(rad(h)) * s, l, Math.cos(rad(h)) * s]
     },
   },
   {
     name: 'HSV',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(-28))),
+    mode: 'hsv',
+    mx: alignToHue(hsv(colorToAlign).h),
     fn: color => {
       const { h, s, v } = hsv(color)
-      return [Math.cos(rad(h)) * s, v, Math.sin(rad(h)) * s]
+      return [Math.sin(rad(h)) * s, v, Math.cos(rad(h)) * s]
+    },
+  },
+  {
+    name: 'P3',
+    mode: 'p3',
+    mx: getRgbMatrix(),
+    fn: color => {
+      const { r, g, b } = p3(color)
+      return [r, g, b]
+    },
+  },
+  {
+    name: 'OKHSL',
+    mode: 'okhsl',
+    mx: alignToHue(okhsl(colorToAlign).h),
+    fn: color => {
+      const { h, s, l } = okhsl(color)
+      return [Math.sin(rad(h)) * s, l, Math.cos(rad(h)) * s]
     },
   },
   {
     name: 'OKHSV',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(20))),
+    mode: 'okhsv',
+    mx: alignToHue(okhsv(colorToAlign).h),
     fn: color => {
       const { h, s, v } = okhsv(color)
-      return [Math.cos(rad(h)) * s, v, Math.sin(rad(h)) * s]
+      return [Math.sin(rad(h)) * s, v, Math.cos(rad(h)) * s]
     },
   },
   {
     name: 'OKLAB',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(18))),
+    mode: 'oklab',
+    mx: alignToHue(oklch(colorToAlign).h),
     fn: color => {
       const { l, a, b } = oklab(color)
-      return [a, l, b]
+      return [b, l, a]
     },
   },
   {
     name: 'OKLrAB',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(18))),
+    mode: 'oklab',
+    mx: alignToHue(oklch(colorToAlign).h),
     fn: color => {
       const { l, a, b } = oklab(color)
-      return [a, betterToe(l), b]
+      return [b, betterToe(l), a]
     },
   },
   {
     name: 'OKLrCH',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(18))),
+    mode: 'oklch',
+    mx: alignToHue(oklch(colorToAlign).h),
     fn: (color, ref) => {
       const { l, c, h } = oklch(color)
       const lr = 1 - betterToe(l)
@@ -102,20 +129,22 @@ export const spaces: SpaceObj[] = [
       }
 
       const angle = getAngle()
-      return [Math.cos(rad(angle)) * lr, c, Math.sin(rad(angle)) * lr]
+      return [Math.sin(rad(angle)) * lr, c, Math.cos(rad(angle)) * lr]
     },
   },
   {
     name: 'LAB',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
+    mode: 'lab',
+    mx: alignToHue(lch(colorToAlign).h),
     fn: color => {
       const { l, a, b } = lab(color)
-      return [a / 100, l / 100, b / 100]
+      return [b / 100, l / 100, a / 100]
     },
   },
   {
     name: 'LCH',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
+    mode: 'lch',
+    mx: alignToHue(lch(colorToAlign).h),
     fn: (color, ref) => {
       const { l, c, h } = lch(color)
       const lightness = 1 - l / 100
@@ -129,47 +158,52 @@ export const spaces: SpaceObj[] = [
       const angle = getAngle()
 
       return [
-        Math.cos(rad(angle)) * lightness,
-        c / 100,
         Math.sin(rad(angle)) * lightness,
+        c / 100,
+        Math.cos(rad(angle)) * lightness,
       ]
     },
   },
   {
     name: 'CIELuv',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(-5))),
+    mode: 'luv',
+    mx: alignToHue(lchuv(colorToAlign).h),
     fn: color => {
       const { l, u, v } = luv(color)
-      return [u / 100, l / 100, v / 100]
+      return [v / 100, l / 100, u / 100]
     },
   },
   {
     name: 'DIN99 Lab',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
+    mode: 'dlab',
+    mx: alignToHue(dlch(colorToAlign).h),
     fn: color => {
       const { l, a, b } = dlab(color)
-      return [a / 100, l / 100, b / 100]
+      return [b / 100, l / 100, a / 100]
     },
   },
   {
     name: 'Jab',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(9))),
+    mode: 'jab',
+    mx: alignToHue(100),
     fn: color => {
       const { j, a, b } = jab(color)
       const m = 1 / 0.222
-      return [a * m, j * m, b * m]
+      return [b * m, j * m, a * m]
     },
   },
   {
     name: 'YIQ',
-    mx: invertedX().multiply(new THREE.Matrix4().makeRotationY(rad(45))),
+    mode: 'yiq',
+    mx: alignToHue(135),
     fn: color => {
       const { y, i, q } = yiq(color)
-      return [q, y, i]
+      return [i, y, q]
     },
   },
   {
     name: 'CIE xyY',
+    mode: 'xyz50',
     mx: getXyzMatrix(),
     boundary: 'unitBox',
     fn: color => {
@@ -184,8 +218,6 @@ export const spaces: SpaceObj[] = [
     },
   },
 ]
-
-type BoundaryType = 'unitBox' | 'planeXY' | 'cylinder'
 
 type BoundaryProps = {
   type?: BoundaryType
@@ -262,4 +294,8 @@ function getXyzMatrix() {
 
 function rad(deg?: number) {
   return ((deg || 0) * Math.PI) / 180
+}
+
+function alignToHue(hue?: number) {
+  return new THREE.Matrix4().makeRotationY(-rad(hue))
 }

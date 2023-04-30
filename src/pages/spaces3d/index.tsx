@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
 import {
-  Box,
   CameraControls,
   OrthographicCamera,
   PerspectiveCamera,
@@ -12,72 +11,62 @@ import './styles.scss'
 import { spaces, Boundary } from './spaces'
 import { Slider } from '@/shared/ui/Slider'
 import { Button } from '@/shared/ui/Button'
-import { makeIndicatorGeometry, makePlaneGeometry } from './gamuts'
+import { makePlaneGeometry } from './gamuts'
+import { Gradient } from './gradient'
+import { Mode, Rgb } from 'culori'
 
 export function Spaces3d() {
+  const morphState = useMorphState()
+  const influences = useSpaceInfluence(morphState.state)
+  const currentSpace =
+    morphState.state.t < 0.5 ? morphState.state.from : morphState.state.to
+  const [gradientMode, setGradientMode] = useState<Mode>('rgb')
+
   const { segments, wireframe, boundary, perspective } = useControls(
     'Display',
     {
-      perspective: true,
+      perspective: false,
       wireframe: false,
       boundary: false,
       segments: { value: 48, min: 6, max: 120, step: 12 },
-    }
+    },
+    { collapsed: true }
   )
-  const { P3, Rec2020, Prophoto, opacity } = useControls('Secondary', {
+  const { sRGB, P3, Rec2020, Prophoto, opacity } = useControls('Gamuts', {
+    sRGB: true,
     P3: false,
     Rec2020: false,
     Prophoto: false,
     opacity: { value: 0.2, min: 0, max: 1, step: 0.1 },
   })
-  const { color, show } = useControls('Color', {
-    show: true,
-    color: { r: 200, b: 125, g: 106 },
+  const { colorA, colorB, show } = useControls('Gradient', {
+    show: false,
+    colorA: { r: 255, b: 0, g: 0 },
+    colorB: { r: 255, b: 255, g: 0 },
   })
-  const [fromTo, setFromTo] = useState([0, 0] as [number, number])
-  const [progress, setProgress] = useState(1)
-  const [morphTargetInfluences, setMorphTargetInfluences] = useState(
-    spaces.map((_, i) => (i === 0 ? 1 : 0) as number)
-  )
-
-  const interpolate = useCallback((t: number, fromTo: [number, number]) => {
-    setProgress(t)
-    setMorphTargetInfluences(influences => {
-      return influences.map((_, i) => {
-        if (i === fromTo[1]) return t
-        if (i === fromTo[0]) return 1 - t
-        return 0
-      })
-    })
-  }, [])
 
   const [selectedPoint, setSelectedPoint] = useState<THREE.Vector3 | null>(null)
 
-  const currentSpace = progress < 0.5 ? fromTo[0] : fromTo[1]
-
-  const goTo = useCallback(
-    (i: number) => {
-      setFromTo([fromTo[1], i])
-      setProgress(1)
-
-      const animationLength = 1000
-      const start = Date.now()
-      const end = start + animationLength
-      requestAnimationFrame(animate)
-
-      function animate() {
-        const now = Date.now()
-        // Cosine interpolation
-        const t =
-          0.5 * (1 - Math.cos(((now - start) / animationLength) * Math.PI))
-        interpolate(t, [fromTo[1], i])
-        if (now < end) requestAnimationFrame(animate)
-      }
-    },
-    [fromTo, interpolate]
+  const colorARgb = useMemo(
+    () =>
+      ({
+        mode: 'rgb',
+        r: colorA.r / 255,
+        g: colorA.g / 255,
+        b: colorA.b / 255,
+      } as Rgb),
+    [colorA]
   )
-
-  const indicatorGeometry = useMemo(() => makeIndicatorGeometry(color), [color])
+  const colorBRgb = useMemo(
+    () =>
+      ({
+        mode: 'rgb',
+        r: colorB.r / 255,
+        g: colorB.g / 255,
+        b: colorB.b / 255,
+      } as Rgb),
+    [colorB]
+  )
 
   const rgbGeometry2 = useMemo(
     () => makePlaneGeometry('rgb', segments, 1),
@@ -114,27 +103,37 @@ export function Spaces3d() {
 
   return (
     <div className="main">
-      <div className="buttons">
-        {spaces.map((space, i) => (
-          <Button
-            key={space.name}
-            onClick={() => goTo(i)}
-            className={currentSpace === i ? 'current' : ''}
-          >
-            {space.name}
-          </Button>
-        ))}
-      </div>
-      <div className="status">
-        {spaces[fromTo[0]].name} → {spaces[fromTo[1]].name}
-        <Slider
-          min={0}
-          max={1}
-          step={0.001}
-          value={[progress]}
-          onValueChange={value => interpolate(value[0], fromTo)}
-          style={{ width: 400 }}
-        />
+      <div className="ui">
+        <div className="buttons">
+          {spaces.map((space, i) => (
+            <Button
+              key={space.name}
+              onClick={() => morphState.goTo(i)}
+              className={currentSpace === i ? 'current' : ''}
+            >
+              {space.name}
+            </Button>
+          ))}
+        </div>
+        <div className="status">
+          {spaces[morphState.state.from].name} →{' '}
+          {spaces[morphState.state.to].name}
+          <Slider
+            min={0}
+            max={1}
+            step={0.001}
+            value={[morphState.state.t]}
+            onValueChange={value => morphState.setProgress(value[0])}
+            style={{ width: 400 }}
+          />
+        </div>
+        {show && gradientMode !== spaces[currentSpace].mode && (
+          <div className="status">
+            <Button onClick={() => setGradientMode(spaces[currentSpace].mode)}>
+              Set gradient in {spaces[currentSpace].name}
+            </Button>
+          </div>
+        )}
       </div>
 
       <main className="canvas">
@@ -154,18 +153,14 @@ export function Spaces3d() {
           /> */}
 
           <group position={[0, -0.5, 0]}>
-            <mesh
-              onClick={e => setSelectedPoint(e.point)}
-              geometry={rgbGeometry2}
-              material={
-                new THREE.MeshBasicMaterial({
-                  side: THREE.DoubleSide,
-                  vertexColors: true,
-                  wireframe,
-                })
-              }
-              morphTargetInfluences={morphTargetInfluences}
-            />
+            {show && (
+              <Gradient
+                colorA={colorARgb}
+                colorB={colorBRgb}
+                mode={gradientMode}
+                morphState={morphState.state}
+              />
+            )}
 
             <mesh
               onClick={e => setSelectedPoint(e.point)}
@@ -177,19 +172,24 @@ export function Spaces3d() {
                   wireframe,
                 })
               }
-              morphTargetInfluences={morphTargetInfluences}
+              morphTargetInfluences={influences}
             />
-            {show && (
+
+            {sRGB && (
               <mesh
-                geometry={indicatorGeometry}
+                onClick={e => setSelectedPoint(e.point)}
+                geometry={rgbGeometry2}
                 material={
                   new THREE.MeshBasicMaterial({
+                    side: THREE.DoubleSide,
                     vertexColors: true,
+                    wireframe,
                   })
                 }
-                morphTargetInfluences={morphTargetInfluences}
+                morphTargetInfluences={influences}
               />
             )}
+
             {boundary && (
               <Boundary
                 type={spaces[currentSpace].boundary}
@@ -206,28 +206,28 @@ export function Spaces3d() {
                   wireframe,
                 })
               }
-              morphTargetInfluences={morphTargetInfluences}
+              morphTargetInfluences={influences}
             /> */}
 
             {P3 && (
               <mesh
                 geometry={p3Geometry}
                 material={secondaryMaterial}
-                morphTargetInfluences={morphTargetInfluences}
+                morphTargetInfluences={influences}
               />
             )}
             {Rec2020 && (
               <mesh
                 geometry={rec2020Geometry}
                 material={secondaryMaterial}
-                morphTargetInfluences={morphTargetInfluences}
+                morphTargetInfluences={influences}
               />
             )}
             {Prophoto && (
               <mesh
                 geometry={prophotoGeometry}
                 material={secondaryMaterial}
-                morphTargetInfluences={morphTargetInfluences}
+                morphTargetInfluences={influences}
               />
             )}
           </group>
@@ -236,4 +236,68 @@ export function Spaces3d() {
       </main>
     </div>
   )
+}
+
+export type MorgphState = {
+  from: number
+  to: number
+  t: number
+}
+
+function useMorphState(initial = { from: 0, to: 0, t: 1 } as MorgphState) {
+  const [morphState, setMorphState] = useState<MorgphState>(initial)
+
+  const setProgress = useCallback((t: number) => {
+    t = Math.max(0, Math.min(1, t))
+    setMorphState(state => ({ ...state, t }))
+  }, [])
+
+  const goTo = useCallback(
+    (i: number, animationLength = 1000) => {
+      if (!animationLength) {
+        setMorphState(state => ({ from: state.to, to: i, t: 1 }))
+        return
+      }
+
+      setMorphState(state => {
+        let current = state.t < 0.5 ? state.from : state.to
+        return { from: current, to: i, t: 0 }
+      })
+      const start = Date.now()
+      const end = start + animationLength
+      requestAnimationFrame(animate)
+
+      function animate() {
+        const now = Date.now()
+        const t = (now - start) / animationLength
+        setProgress(cosine(t))
+        if (now < end) requestAnimationFrame(animate)
+      }
+    },
+    [setProgress]
+  )
+
+  return { state: morphState, goTo, setProgress }
+}
+
+function useSpaceInfluence(morphState: MorgphState) {
+  const { from, to, t } = morphState
+
+  const morphTargetInfluences = useMemo(() => {
+    const influences = new Array(spaces.length).fill(0)
+    if (from === to) {
+      influences[from] = 1
+      return influences
+    }
+    influences[from] = 1 - t
+    influences[to] = t
+    return influences
+  }, [from, to, t])
+
+  return morphTargetInfluences
+}
+
+/** Cosine interpolation */
+function cosine(t: number) {
+  return 0.5 * (1 - Math.cos(t * Math.PI))
 }
