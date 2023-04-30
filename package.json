@@ -1,11 +1,12 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "color-playground",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "test": "vitest",
     "start": "vite",
+    "host": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
@@ -44,6 +45,7 @@
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@types/three": "^0.150.1",
+    "@vitejs/plugin-basic-ssl": "^1.0.1",
     "@vitejs/plugin-react": "^3.1.0",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.29.0",
