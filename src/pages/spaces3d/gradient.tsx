@@ -38,7 +38,7 @@ export function Gradient(props: GradientProps) {
 
     const positions = spaces.map(space => {
       return colors.map(color => {
-        const vector = new THREE.Vector3(...space.fn(color))
+        const vector = new THREE.Vector3(...space.toPosition(color))
         if (space.mx) vector.applyMatrix4(space.mx)
         return [vector.x, vector.y, vector.z] as [number, number, number]
       })

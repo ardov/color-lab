@@ -45,7 +45,7 @@ export function makeCubeGeometry(
     )
 
     spaces.forEach((space, i) => {
-      const [x, y, z] = space.fn(rgbColor)
+      const [x, y, z] = space.toPosition(rgbColor)
       positions[i].push(x, y, z)
     })
   }
@@ -98,7 +98,7 @@ export function makePlaneGeometry(
     }
 
     spaces.forEach((space, i) => {
-      const [x, y, z] = space.fn(rgbColor, getRefColor())
+      const [x, y, z] = space.toPosition(rgbColor, getRefColor())
       positions[i].push(x, y, z)
     })
   }
@@ -132,7 +132,7 @@ export function makeIndicatorGeometry(colorInitial: {
     g: colorInitial.g / 255,
     b: colorInitial.b / 255,
   } as Rgb
-  const positionsInSpaces = spaces.map(space => space.fn(colorRgb))
+  const positionsInSpaces = spaces.map(space => space.toPosition(colorRgb))
 
   let positions = spaces.map(() => [] as number[])
   let color = [] as number[]
