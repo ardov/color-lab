@@ -73,6 +73,17 @@ export function Picker() {
           />
         </Interactive>
 
+        <div
+          style={{
+            padding: '16px 16px 8px',
+            color: textColor,
+            fontFamily: 'monospace',
+            fontSize: 15,
+            textAlign: 'center',
+          }}
+        >
+          {formatCss(roundColor(color))}
+        </div>
         <div style={{ padding: 8 }}>
           <HueSlider
             hue={hslHue}
@@ -82,17 +93,6 @@ export function Picker() {
               setHslHue(h)
             }}
           />
-        </div>
-        <div
-          style={{
-            padding: '8px 16px 16px',
-            color: textColor,
-            fontFamily: 'monospace',
-            fontSize: 15,
-            textAlign: 'center',
-          }}
-        >
-          {formatCss(roundColor(color))}
         </div>
       </div>
     </div>
