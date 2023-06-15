@@ -38,6 +38,9 @@ export function Picker() {
   const shadowColor = formatHex(
     clampChroma({ mode: 'oklch', l: 0.14, c: 0.08, h: hue })
   )
+  const textColor = formatHex(
+    clampChroma({ mode: 'oklch', l: 0.6, c: 0.1, h: hue })
+  )
 
   return (
     <div
@@ -83,7 +86,7 @@ export function Picker() {
         <div
           style={{
             padding: '8px 16px 16px',
-            color: 'rgb(255 255 255 / 0.6)',
+            color: textColor,
             fontFamily: 'monospace',
             fontSize: 15,
             textAlign: 'center',
@@ -102,12 +105,7 @@ const roundColor = (color: Oklch) => {
   let errors = 0
   let channel = 'l' as 'l' | 'c' | 'h'
   let digits = 3
-  // let copy = {
-  //   ...color,
-  //   l: +color.l.toFixed(digits),
-  //   c: +color.c.toFixed(digits),
-  //   h: +(color.h || 0).toFixed(digits),
-  // } as Oklch
+  // let copy = { ...color } as Oklch
   let copy = oklch(parseHex(hex))
   copy.l = +color.l.toFixed(digits)
   copy.c = +color.c.toFixed(digits)
