@@ -45,15 +45,15 @@ export function Picker() {
   return (
     <div
       className="picker-scene"
-      style={{ background: `radial-gradient(${bgColor}, black)` }}
+      style={{ background: `radial-gradient(at 50% 64%, ${bgColor}, black)` }}
     >
       <div
         className="wrapper"
         style={{
           boxShadow: `
-          0 8px 16px -8px ${shadowColor},
-          0 0px 56px -16px ${shadowColor}
-          `,
+            0 8px 32px -16px ${shadowColor},
+            0 16px 64px -24px ${shadowColor}
+            `,
         }}
       >
         <Interactive
