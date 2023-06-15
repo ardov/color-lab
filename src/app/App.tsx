@@ -10,6 +10,7 @@ import { Sliders } from '@/pages/controls'
 import { Spaces } from '@/pages/space'
 import { Spaces3d } from '@/pages/spaces3d'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
+import { Picker } from '@/pages/picker'
 
 const theme = makeTheme({
   type: 'dark',
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/spaces-3d" element={<Spaces3d />} />
       <Route path="/sliders" element={<Sliders />} />
+      <Route path="/picker" element={<Picker />} />
       <Route path="*" element={<Themer />} />
     </Routes>
   )
