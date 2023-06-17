@@ -1,12 +1,12 @@
 // Source:
 // https://github.com/omgovich/react-colorful/blob/master/src/components/common/Interactive.tsx
 
-import React, { useRef, useMemo, useEffect } from 'react'
+import React, { useRef, useMemo, useEffect, FC } from 'react'
 
-// Clamps a value between an upper and lower bound.
-// We use ternary operators because it makes the minified code
-// 2 times shorter then `Math.min(Math.max(a,b),c)`
+/** Clamps a value between an upper and lower bound. */
 export const clamp = (number: number, min = 0, max = 1): number => {
+  // Ternary operators make the minified code
+  // 2 times shorter then `Math.min(Math.max(a,b),c)`
   return number > max ? max : number < min ? min : number
 }
 
@@ -23,21 +23,9 @@ export function useEventCallback<T>(
   return fn.current
 }
 
-export interface Interaction {
+export type Position = {
   left: number
   top: number
-}
-
-// Check if an event was triggered by touch
-const isTouch = (event: MouseEvent | TouchEvent): event is TouchEvent =>
-  'touches' in event
-
-// Finds a proper touch point by its identifier
-const getTouchPoint = (touches: TouchList, touchId: null | number): Touch => {
-  for (let i = 0; i < touches.length; i++) {
-    if (touches[i].identifier === touchId) return touches[i]
-  }
-  return touches[0]
 }
 
 // Finds the proper window object to fix iframe embedding issues
@@ -47,100 +35,53 @@ const getParentWindow = (node?: HTMLDivElement | null): Window => {
 }
 
 // Returns a relative position of the pointer inside the node's bounding box
-const getRelativePosition = (
+const getRelativePosition2 = (
   node: HTMLDivElement,
-  event: MouseEvent | TouchEvent,
-  touchId: null | number
-): Interaction => {
+  event: React.PointerEvent | PointerEvent
+): Position => {
   const rect = node.getBoundingClientRect()
-
-  // Get user's pointer position from `touches` array if it's a `TouchEvent`
-  const pointer = isTouch(event)
-    ? getTouchPoint(event.touches, touchId)
-    : (event as MouseEvent)
-
   return {
-    left: clamp(
-      (pointer.pageX - (rect.left + getParentWindow(node).pageXOffset)) /
-        rect.width
-    ),
-    top: clamp(
-      (pointer.pageY - (rect.top + getParentWindow(node).pageYOffset)) /
-        rect.height
-    ),
+    left: clamp((event.clientX - rect.left) / rect.width),
+    top: clamp((event.clientY - rect.top) / rect.height),
   }
 }
 
-// Browsers introduced an intervention, making touch events passive by default.
-// This workaround removes `preventDefault` call from the touch handlers.
-// https://github.com/facebook/react/issues/19651
-const preventDefaultMove = (event: MouseEvent | TouchEvent): void => {
-  !isTouch(event) && event.preventDefault()
-}
-
-// Prevent mobile browsers from handling mouse events (conflicting with touch ones).
-// If we detected a touch interaction before, we prefer reacting to touch events only.
-const isInvalid = (
-  event: MouseEvent | TouchEvent,
-  hasTouch: boolean
-): boolean => {
-  return hasTouch && !isTouch(event)
-}
-
-interface Props {
-  onMove: (interaction: Interaction) => void
-  onKey: (offset: Interaction) => void
+type InteractiveProps = {
+  onChange?: (pos: Position) => void
+  onInput?: (pos: Position) => void
+  onMove: (interaction: Position) => void
+  onKey: (offset: Position) => void
   children: React.ReactNode
 }
 
-const InteractiveBase = ({ onMove, onKey, ...rest }: Props) => {
+const InteractiveBase: FC<InteractiveProps> = props => {
+  const { onChange, onInput, onMove, onKey, ...rest } = props
   const container = useRef<HTMLDivElement>(null)
-  const onMoveCallback = useEventCallback<Interaction>(onMove)
-  const onKeyCallback = useEventCallback<Interaction>(onKey)
-  const touchId = useRef<null | number>(null)
-  const hasTouch = useRef(false)
+  const onChangeCallback = useEventCallback<Position>(onChange)
+  const onInputCallback = useEventCallback<Position>(onInput)
+  const onMoveCallback = useEventCallback<Position>(onMove)
+  const onKeyCallback = useEventCallback<Position>(onKey)
 
   const [handleMoveStart, handleKeyDown, toggleDocumentEvents] = useMemo(() => {
-    const handleMoveStart = ({
-      nativeEvent,
-    }: React.MouseEvent | React.TouchEvent) => {
+    const handleMoveStart = (event: React.PointerEvent) => {
+      // Only to primary pointer events
+      if (!event.isPrimary) return false
+      // Only to left mouse button
+      if (event.pointerType === 'mouse' && event.button !== 0) return false
+      event.preventDefault() // Prevent text selection
       const el = container.current
       if (!el) return
-
-      // Prevent text selection
-      preventDefaultMove(nativeEvent)
-
-      if (isInvalid(nativeEvent, hasTouch.current) || !el) return
-
-      if (isTouch(nativeEvent)) {
-        hasTouch.current = true
-        const changedTouches = nativeEvent.changedTouches || []
-        if (changedTouches.length)
-          touchId.current = changedTouches[0].identifier
-      }
-
       el.focus()
-      onMoveCallback(getRelativePosition(el, nativeEvent, touchId.current))
+      onMoveCallback(getRelativePosition2(el, event))
       toggleDocumentEvents(true)
     }
 
-    const handleMove = (event: MouseEvent | TouchEvent) => {
-      // Prevent text selection
-      preventDefaultMove(event)
+    const handleMove = (event: PointerEvent) => {
+      if (!event.isPrimary) return
+      event.preventDefault() // Prevent text selection
 
-      // If user moves the pointer outside of the window or iframe bounds and release it there,
-      // `mouseup`/`touchend` won't be fired. In order to stop the picker from following the cursor
-      // after the user has moved the mouse/finger back to the document, we check `event.buttons`
-      // and `event.touches`. It allows us to detect that the user is just moving his pointer
-      // without pressing it down
-      const isDown = isTouch(event)
-        ? event.touches.length > 0
-        : event.buttons > 0
-
-      if (isDown && container.current) {
-        onMoveCallback(
-          getRelativePosition(container.current, event, touchId.current)
-        )
+      if (event.buttons > 0) {
+        onMoveCallback(getRelativePosition2(container.current!, event))
       } else {
         toggleDocumentEvents(false)
       }
@@ -168,16 +109,15 @@ const InteractiveBase = ({ onMove, onKey, ...rest }: Props) => {
     }
 
     function toggleDocumentEvents(state?: boolean) {
-      const touch = hasTouch.current
-      const el = container.current
-      const parentWindow = getParentWindow(el)
+      console.log('toggleDocumentEvents', state)
 
+      const parentWindow = getParentWindow(container.current)
       // Add or remove additional pointer event listeners
       const toggleEvent = state
         ? parentWindow.addEventListener
         : parentWindow.removeEventListener
-      toggleEvent(touch ? 'touchmove' : 'mousemove', handleMove)
-      toggleEvent(touch ? 'touchend' : 'mouseup', handleMoveEnd)
+      toggleEvent('pointermove', handleMove)
+      toggleEvent('pointerup', handleMoveEnd)
     }
 
     return [handleMoveStart, handleKeyDown, toggleDocumentEvents]
@@ -189,13 +129,12 @@ const InteractiveBase = ({ onMove, onKey, ...rest }: Props) => {
   return (
     <div
       {...rest}
-      onTouchStart={handleMoveStart}
-      onMouseDown={handleMoveStart}
       className="interactive"
       ref={container}
-      onKeyDown={handleKeyDown}
       tabIndex={0}
       role="slider"
+      onKeyDown={handleKeyDown}
+      onPointerDown={handleMoveStart}
     />
   )
 }
