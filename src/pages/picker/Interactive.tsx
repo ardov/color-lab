@@ -1,16 +1,14 @@
-// Source:
-// https://github.com/omgovich/react-colorful/blob/master/src/components/common/Interactive.tsx
-
+// Based on github.com/omgovich/react-colorful
 import React, { useRef, useMemo, useEffect, FC } from 'react'
 
 /** Clamps a value between an upper and lower bound. */
-export const clamp = (number: number, min = 0, max = 1): number => {
+export function clamp(number: number, min = 0, max = 1): number {
   // Ternary operators make the minified code
   // 2 times shorter then `Math.min(Math.max(a,b),c)`
   return number > max ? max : number < min ? min : number
 }
 
-// Saves incoming handler to the ref in order to avoid "useCallback hell"
+/** Saves incoming handler to the ref in order to avoid "useCallback hell" */
 export function useEventCallback<T>(
   handler?: (value: T) => void
 ): (value: T) => void {
@@ -19,26 +17,22 @@ export function useEventCallback<T>(
     callbackRef.current && callbackRef.current(value)
   })
   callbackRef.current = handler
-
   return fn.current
 }
 
-export type Position = {
-  left: number
-  top: number
-}
+export type Position = { left: number; top: number }
 
-// Finds the proper window object to fix iframe embedding issues
-const getParentWindow = (node?: HTMLDivElement | null): Window => {
+/** Finds the proper window object to fix iframe embedding issues */
+function getParentWindow(node?: HTMLDivElement | null): Window {
   // eslint-disable-next-line no-restricted-globals
   return (node && node.ownerDocument.defaultView) || self
 }
 
-// Returns a relative position of the pointer inside the node's bounding box
-const getRelativePosition2 = (
+/** Returns a relative position of the pointer inside the node's bounding box */
+function getRelativePosition(
   node: HTMLDivElement,
   event: React.PointerEvent | PointerEvent
-): Position => {
+): Position {
   const rect = node.getBoundingClientRect()
   return {
     left: clamp((event.clientX - rect.left) / rect.width),
@@ -47,11 +41,11 @@ const getRelativePosition2 = (
 }
 
 type InteractiveProps = {
+  children: React.ReactNode
   onChange?: (pos: Position) => void
   onInput?: (pos: Position) => void
-  onMove: (interaction: Position) => void
-  onKey: (offset: Position) => void
-  children: React.ReactNode
+  onMove?: (interaction: Position) => void
+  onKey?: (offset: Position) => void
 }
 
 const InteractiveBase: FC<InteractiveProps> = props => {
@@ -61,6 +55,9 @@ const InteractiveBase: FC<InteractiveProps> = props => {
   const onInputCallback = useEventCallback<Position>(onInput)
   const onMoveCallback = useEventCallback<Position>(onMove)
   const onKeyCallback = useEventCallback<Position>(onKey)
+  const startPosition = useRef<Position>({ left: 0, top: 0 })
+  const currentPosition = useRef<Position>({ left: 0, top: 0 })
+  const keyStep = 0.02
 
   const [handleMoveStart, handleKeyDown, toggleDocumentEvents] = useMemo(() => {
     const handleMoveStart = (event: React.PointerEvent) => {
@@ -72,7 +69,11 @@ const InteractiveBase: FC<InteractiveProps> = props => {
       const el = container.current
       if (!el) return
       el.focus()
-      onMoveCallback(getRelativePosition2(el, event))
+      const position = getRelativePosition(el, event)
+      startPosition.current = position
+      currentPosition.current = position
+      onInputCallback(position)
+      onMoveCallback(position)
       toggleDocumentEvents(true)
     }
 
@@ -81,36 +82,52 @@ const InteractiveBase: FC<InteractiveProps> = props => {
       event.preventDefault() // Prevent text selection
 
       if (event.buttons > 0) {
-        onMoveCallback(getRelativePosition2(container.current!, event))
+        const position = getRelativePosition(container.current!, event)
+        if (event.shiftKey) {
+          const dx = position.left - startPosition.current.left
+          const dy = position.top - startPosition.current.top
+          const absDx = Math.abs(dx)
+          const absDy = Math.abs(dy)
+          if (absDx > absDy) {
+            position.top = startPosition.current.top
+          } else {
+            position.left = startPosition.current.left
+          }
+        }
+        currentPosition.current = position
+        onInputCallback(position)
+        onMoveCallback(position)
       } else {
         toggleDocumentEvents(false)
+        onChangeCallback(currentPosition.current)
       }
     }
 
-    const handleMoveEnd = () => toggleDocumentEvents(false)
+    const handleMoveEnd = () => {
+      onChangeCallback(currentPosition.current)
+      toggleDocumentEvents(false)
+    }
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
         event.preventDefault() // Prevent scrolling by arrow keys
-        onKeyCallback({ left: -0.05, top: 0 })
+        onKeyCallback({ left: -keyStep, top: 0 })
       }
       if (event.key === 'ArrowRight') {
         event.preventDefault() // Prevent scrolling by arrow keys
-        onKeyCallback({ left: 0.05, top: 0 })
+        onKeyCallback({ left: keyStep, top: 0 })
       }
       if (event.key === 'ArrowUp') {
         event.preventDefault() // Prevent scrolling by arrow keys
-        onKeyCallback({ left: 0, top: -0.05 })
+        onKeyCallback({ left: 0, top: -keyStep })
       }
       if (event.key === 'ArrowDown') {
         event.preventDefault() // Prevent scrolling by arrow keys
-        onKeyCallback({ left: 0, top: 0.05 })
+        onKeyCallback({ left: 0, top: keyStep })
       }
     }
 
     function toggleDocumentEvents(state?: boolean) {
-      console.log('toggleDocumentEvents', state)
-
       const parentWindow = getParentWindow(container.current)
       // Add or remove additional pointer event listeners
       const toggleEvent = state

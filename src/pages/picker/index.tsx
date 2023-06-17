@@ -3,7 +3,7 @@ import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { formatCss, formatHex, Oklch, oklch, parseHex } from 'culori'
 import { FC, useState } from 'react'
 import { CanvasComparison } from './CanvasComparison'
-import { Interactive } from './Interactive'
+import { clamp, Interactive } from './Interactive'
 import './picker.scss'
 import { Pointer } from './Pointer'
 import { getMaxChroma } from './shared'
@@ -15,12 +15,11 @@ export function Picker() {
   applyTheme(document.body, theme)
   const [luminosity, setLuminosity] = useState(0.5)
   const [chroma, setChroma] = useState(0)
-  const [hslHue, setHslHue] = useState(0)
   const [hue, setHue] = useState(0)
+  const [mode, setMode] = useState<'srgb' | 'display-p3'>('srgb')
   const width = 280
   const height = 360
 
-  const mode = 'srgb'
   const maxChroma = getMaxChroma(mode)
 
   const color = clampChroma(
@@ -58,15 +57,22 @@ export function Picker() {
         }}
       >
         <Interactive
-          onKey={offset => console.log('onKey', offset)}
-          onMove={offset => {
-            const { left, top } = offset
+          onKey={offset => {
+            setChroma(clamp(chroma + offset.left * maxChroma, 0, maxChroma))
+            setLuminosity(luminosity - offset.top)
+          }}
+          onInput={position => {
+            const { left, top } = position
             setChroma(left * maxChroma)
             setLuminosity(1 - top)
-            console.log('onMove', offset)
           }}
         >
-          <CanvasComparison width={width} height={height} hue={hue} />
+          <CanvasComparison
+            width={width}
+            height={height}
+            hue={hue}
+            mode={mode}
+          />
           <Pointer
             color={formatHex(color)}
             left={chroma / maxChroma}
@@ -82,18 +88,12 @@ export function Picker() {
             fontSize: 15,
             textAlign: 'center',
           }}
+          onClick={() => setMode(mode === 'srgb' ? 'display-p3' : 'srgb')}
         >
           {formatCss(roundColor(color))}
         </div>
         <div style={{ padding: 8 }}>
-          <HueSlider
-            hue={hslHue}
-            onChange={h => {
-              const hue = oklch({ mode: 'hsl', h, s: 1, l: 0.5 }).h || 0
-              setHue(hue)
-              setHslHue(h)
-            }}
-          />
+          <HueSlider hue={hue} onChange={setHue} />
         </div>
       </div>
     </div>
@@ -131,6 +131,8 @@ const roundColor = (color: Oklch) => {
   }
 }
 
+const gradient = makeHueGradient(50, 'srgb', 0.75)
+
 const HueSlider: FC<{
   hue: number
   onChange: (hue: number) => void
@@ -140,15 +142,16 @@ const HueSlider: FC<{
   const left = deg / 360
   return (
     <Interactive
-      onKey={offset => console.log('onKey', offset)}
+      onKey={offset => {
+        onChange(hue + (offset.left - offset.top) * 360)
+      }}
       onMove={offset => onChange(offset.left * 360)}
     >
-      <div
-        className="hue-slider"
-        style={{ background: makeHueGradient(50, 'srgb', 0.2) }}
-      />
+      <div className="hue-slider" style={{ background: gradient }} />
       <Pointer
-        color={formatHex({ mode: 'hsl', h: hue, s: 1, l: 0.5 })}
+        color={formatHex(
+          clampChroma({ mode: 'oklch', l: 0.75, c: 0.5, h: hue })
+        )}
         left={left}
       />
     </Interactive>
