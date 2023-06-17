@@ -7,6 +7,7 @@ import { Interactive } from './Interactive'
 import './picker.scss'
 import { Pointer } from './Pointer'
 import { getMaxChroma } from './shared'
+import './polyfill.js'
 
 const theme = makeTheme({})
 
@@ -142,11 +143,29 @@ const HueSlider: FC<{
       onKey={offset => console.log('onKey', offset)}
       onMove={offset => onChange(offset.left * 360)}
     >
-      <div className="hue-slider" />
+      <div
+        className="hue-slider"
+        style={{ background: makeHueGradient(50, 'srgb', 0.2) }}
+      />
       <Pointer
         color={formatHex({ mode: 'hsl', h: hue, s: 1, l: 0.5 })}
         left={left}
       />
     </Interactive>
   )
+}
+
+function makeHueGradient(
+  steps: number,
+  mode: 'srgb' | 'display-p3' = 'srgb',
+  l = 0.75
+) {
+  const colors = new Array(steps)
+    .fill(0)
+    .map((_, i) => {
+      const h = (i / steps) * 360
+      return clampChroma({ mode: 'oklch', l, c: 0.5, h }, mode)
+    })
+    .map(formatHex)
+  return `linear-gradient(to right, ${colors.join(', ')})`
 }

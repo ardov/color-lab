@@ -1,4 +1,4 @@
-import { RGBA } from '@/shared/lib/huelab'
+type RGBA = [number, number, number, number]
 
 /**
  * Set of pixels with convenient interface
