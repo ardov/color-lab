@@ -1,5 +1,6 @@
 // Based on github.com/omgovich/react-colorful
-import React, { useRef, useMemo, useEffect, FC } from 'react'
+import type { FC } from 'react'
+import React, { useRef, useMemo, useEffect } from 'react'
 
 /** Clamps a value between an upper and lower bound. */
 export function clamp(number: number, min = 0, max = 1): number {
@@ -31,25 +32,28 @@ function getParentWindow(node?: HTMLDivElement | null): Window {
 /** Returns a relative position of the pointer inside the node's bounding box */
 function getRelativePosition(
   node: HTMLDivElement,
-  event: React.PointerEvent | PointerEvent
+  event: React.PointerEvent | PointerEvent,
+  unclamped: boolean = false
 ): Position {
   const rect = node.getBoundingClientRect()
+  const left = (event.clientX - rect.left) / rect.width
+  const top = (event.clientY - rect.top) / rect.height
+
   return {
-    left: clamp((event.clientX - rect.left) / rect.width),
-    top: clamp((event.clientY - rect.top) / rect.height),
+    left: unclamped ? left : clamp(left),
+    top: unclamped ? top : clamp(top),
   }
 }
 
-type InteractiveProps = {
+const TouchpadBase: FC<{
   children: React.ReactNode
+  unclamped?: boolean
   onChange?: (pos: Position) => void
   onInput?: (pos: Position) => void
   onMove?: (interaction: Position) => void
   onKey?: (offset: Position) => void
-}
-
-const InteractiveBase: FC<InteractiveProps> = props => {
-  const { onChange, onInput, onMove, onKey, ...rest } = props
+}> = props => {
+  const { onChange, onInput, onMove, onKey, unclamped, ...rest } = props
   const container = useRef<HTMLDivElement>(null)
   const onChangeCallback = useEventCallback<Position>(onChange)
   const onInputCallback = useEventCallback<Position>(onInput)
@@ -69,7 +73,7 @@ const InteractiveBase: FC<InteractiveProps> = props => {
       const el = container.current
       if (!el) return
       el.focus()
-      const position = getRelativePosition(el, event)
+      const position = getRelativePosition(el, event, unclamped)
       startPosition.current = position
       currentPosition.current = position
       onInputCallback(position)
@@ -82,7 +86,11 @@ const InteractiveBase: FC<InteractiveProps> = props => {
       event.preventDefault() // Prevent text selection
 
       if (event.buttons > 0) {
-        const position = getRelativePosition(container.current!, event)
+        const position = getRelativePosition(
+          container.current!,
+          event,
+          unclamped
+        )
         if (event.shiftKey) {
           const dx = position.left - startPosition.current.left
           const dy = position.top - startPosition.current.top
@@ -138,7 +146,13 @@ const InteractiveBase: FC<InteractiveProps> = props => {
     }
 
     return [handleMoveStart, handleKeyDown, toggleDocumentEvents]
-  }, [onKeyCallback, onMoveCallback])
+  }, [
+    onChangeCallback,
+    onInputCallback,
+    onKeyCallback,
+    onMoveCallback,
+    unclamped,
+  ])
 
   // Remove window event listeners before unmounting
   useEffect(() => toggleDocumentEvents, [toggleDocumentEvents])
@@ -146,7 +160,7 @@ const InteractiveBase: FC<InteractiveProps> = props => {
   return (
     <div
       {...rest}
-      className="interactive"
+      className="pckr__interactive"
       ref={container}
       tabIndex={0}
       role="slider"
@@ -156,4 +170,4 @@ const InteractiveBase: FC<InteractiveProps> = props => {
   )
 }
 
-export const Interactive = React.memo(InteractiveBase)
+export const Touchpad = React.memo(TouchpadBase)
