@@ -23,8 +23,8 @@ export const Canvas: FC<{
   const cbRef = useRef<number>()
 
   useEffect(() => {
-    const previewWidth = width / 10
-    const previewHeight = height / 2
+    const previewWidth = 16
+    const previewHeight = 72
     if (cbRef.current) cancelIdleCallback(cbRef.current)
 
     const render = (width: number, height: number) =>
