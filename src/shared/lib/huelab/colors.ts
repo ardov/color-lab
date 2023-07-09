@@ -55,12 +55,13 @@ export function getAlphaColor(bg: Rgb, target: Rgb): Rgb {
 }
 
 export function clampChroma(
-  color: Oklch,
+  color: Color,
   mode: 'srgb' | 'display-p3' = 'srgb'
 ) {
-  if (displayable(color, mode)) return color
-  let c = findHighest(c => displayable({ ...color, c }, mode), [0, 0.4])
-  return { ...color, c } as Oklch
+  const okColor = oklch(color)
+  if (displayable(okColor, mode)) return okColor
+  let c = findHighest(c => displayable({ ...okColor, c }, mode), [0, 0.4])
+  return { ...okColor, c } as Oklch
 }
 
 export function adjustL(
