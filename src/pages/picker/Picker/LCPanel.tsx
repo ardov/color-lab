@@ -13,6 +13,7 @@ export const LCPanel: FC<{
   h: number
   gamut?: Gamut
   pointerColor?: string | null
+  children?: React.ReactNode
   onChange: (l: number, c: number) => void
 }> = props => {
   const {
@@ -23,6 +24,7 @@ export const LCPanel: FC<{
     h,
     gamut = Gamut.SRGB,
     pointerColor,
+    children,
     onChange,
   } = props
   const maxChroma = getMaxChroma(gamut)
@@ -47,6 +49,7 @@ export const LCPanel: FC<{
         className="pckr__canvas"
       />
       <Pointer color={pointerColor} left={c / maxChroma} top={1 - lr} />
+      {children}
     </Touchpad>
   )
 }

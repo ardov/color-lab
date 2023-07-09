@@ -6,8 +6,8 @@ type ColorStop = [Color, number]
 
 export function gradientToRgb(
   stops: ColorStop[],
-  mode: Mode,
-  treshold: number
+  mode: Mode = 'rgb',
+  treshold: number = 0.01
 ) {
   const pairs = splitIntoPairs(stops)
   const resolvedPairs = pairs.map(pair => resolvePair(pair, mode, treshold))

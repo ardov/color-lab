@@ -5,34 +5,67 @@ import { useState } from 'react'
 import './styles.scss'
 import { Gamut } from './Picker/shared'
 import { HexPicker } from './Picker'
+import { gradientToRgb } from '@/shared/lib/huelab/gradientToRgb'
+import { Oklrch } from './Picker/oklrch'
+
+console.log(
+  'gradientToRgb',
+  gradientToRgb(
+    [
+      ['#000', 0],
+      ['#fff', 1],
+    ],
+    'oklch'
+  ).map(stop => [formatHex(stop[0]), stop[1]])
+)
 
 export function PickerWrapper() {
-  const [hue, setHue] = useState(0)
   const [gamut, setGamut] = useState<Gamut>(Gamut.SRGB)
   const [hex, setHex] = useState('#ff00ff')
+  const [intention, setIntention] = useState(null as Oklrch | null)
+
+  const h = intention?.h || 0
 
   const bgColor = formatHex(
-    clampChroma({ mode: 'oklch', l: 0.3, c: 0.04, h: hue })
+    clampChroma({
+      mode: 'oklch',
+      l: 0.3,
+      c: Math.min(intention?.c || 0, 0.04),
+      h: h,
+    })
   )
-  const shadowColor = formatCss(
-    hsl(clampChroma({ mode: 'oklch', l: 0.8, c: 0.2, h: hue, alpha: 0.08 }))
+  const bgColor2 = formatHex(
+    clampChroma({
+      mode: 'oklch',
+      l: betterToeInv(0.04),
+      c: Math.min(intention?.c || 0, 0.04),
+      h: h,
+    })
   )
-  const textColor = formatHex(
-    clampChroma({ mode: 'oklch', l: 0.6, c: 0.1, h: hue })
-  )
+  // const shadowColor = formatCss(
+  //   hsl(clampChroma({ mode: 'oklch', l: 0.8, c: 0.2, h: h, alpha: 0.08 }))
+  // )
+  // const textColor = formatHex(
+  //   clampChroma({ mode: 'oklch', l: 0.6, c: 0.1, h: h })
+  // )
 
   return (
     <div
       className="picker-scene"
-      style={{ background: `radial-gradient(at 50% 64%, ${bgColor}, black)` }}
+      style={{
+        background: `radial-gradient(70% 80% at 50% 72%, ${bgColor}, ${bgColor2})`,
+      }}
     >
       <div>{hex}</div>
       <HexPicker
         value={hex}
-        onChange={setHex}
-        style={{
-          boxShadow: `0 -16px 24px 0px ${shadowColor}`,
+        onChange={e => {
+          setHex(e.value)
+          setIntention(e.oklch)
         }}
+        // style={{
+        //   boxShadow: `0 -16px 24px 0px ${shadowColor}`,
+        // }}
       />
     </div>
   )

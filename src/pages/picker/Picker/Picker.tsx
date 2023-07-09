@@ -10,9 +10,15 @@ import './Picker.scss'
 import { oklrch, Oklrch, oklrchToOklch } from './oklrch'
 import { clamp } from './Touchpad'
 
+type PickerEvent = {
+  /** Gamut clamped hex */
+  value: string // hex
+  oklch: Oklrch // intention
+}
+
 export function HexPicker(props: {
   value: string
-  onChange: (value: string) => void
+  onChange: (event: PickerEvent) => void
 }) {
   const { value, onChange } = props
   const [intention, setIntention] = useState<Oklrch>(toOklrch(value))
@@ -30,11 +36,9 @@ export function HexPicker(props: {
       setIntention(color)
       const newHex = toHex(color)
       setHex(newHex)
-      if (newHex !== value) {
-        onChange(newHex)
-      }
+      onChange({ value: newHex, oklch: color })
     },
-    [onChange, value]
+    [onChange]
   )
 
   return (
@@ -83,50 +87,7 @@ function IntentionPicker(
   const width = 280
   const height = 360
 
-  /**
-   * Use gaming like controls to change the color
-   * W/S: Lightness
-   * A/D: Chroma
-   * Q/E: Hue
-   * Shift: 5x speed
-   * Alt: 0.2x speed
-   */
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const lStep = 0.01
-      const cStep = 0.005
-      const hStep = 0.5
-      const multiplier = e.shiftKey ? 5 : e.altKey ? 0.2 : 1
-      switch (e.code) {
-        // Handle WASD keys
-        case 'KeyW':
-          onChange({ ...value, l: clamp(value.l + lStep * multiplier) })
-          break
-        case 'KeyS':
-          onChange({ ...value, l: clamp(value.l - lStep * multiplier) })
-          break
-        case 'KeyA':
-          onChange({
-            ...value,
-            c: clamp(value.c - cStep, 0, getMaxChroma(gamut)),
-          })
-          break
-        case 'KeyD':
-          onChange({
-            ...value,
-            c: clamp(value.c + cStep, 0, getMaxChroma(gamut)),
-          })
-          break
-        case 'KeyQ':
-          onChange({ ...value, h: (value.h || 0) - hStep * multiplier })
-          break
-        case 'KeyE':
-          onChange({ ...value, h: (value.h || 0) + hStep * multiplier })
-          break
-      }
-    },
-    [gamut, onChange, value]
-  )
+  const handleKeyDown = useKeyControlls(value, onChange, gamut)
 
   return (
     <div
@@ -151,5 +112,56 @@ function IntentionPicker(
         />
       </div>
     </div>
+  )
+}
+
+/**
+ * Use gaming like controls to change the color
+ * W/S: Lightness
+ * A/D: Chroma
+ * Q/E: Hue
+ * Shift: 5x step
+ * Alt: 0.2x step
+ */
+function useKeyControlls(
+  value: Oklrch,
+  onChange: (value: Oklrch) => void,
+  gamut: Gamut
+) {
+  return useCallback(
+    (e: React.KeyboardEvent) => {
+      const lStep = 0.01
+      const cStep = 0.005
+      const hStep = 0.5
+      const multiplier = e.shiftKey ? 5 : e.altKey ? 0.2 : 1
+      switch (e.code) {
+        // Handle WASD keys
+        case 'KeyW':
+          onChange({ ...value, l: clamp(value.l + lStep * multiplier) })
+          break
+        case 'KeyS':
+          onChange({ ...value, l: clamp(value.l - lStep * multiplier) })
+          break
+        case 'KeyA':
+          onChange({
+            ...value,
+            c: clamp(value.c - cStep * multiplier, 0, getMaxChroma(gamut)),
+          })
+          break
+        case 'KeyD':
+          onChange({
+            ...value,
+            c: clamp(value.c + cStep * multiplier, 0, getMaxChroma(gamut)),
+          })
+          break
+        case 'KeyQ':
+          onChange({ ...value, h: (value.h || 0) - hStep * multiplier })
+          break
+        case 'KeyE':
+          onChange({ ...value, h: (value.h || 0) + hStep * multiplier })
+          break
+      }
+    },
+    [gamut, onChange, value]
   )
 }
