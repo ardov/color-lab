@@ -7,6 +7,7 @@ import { Gamut } from './Picker/shared'
 import { HexPicker } from './Picker'
 import { gradientToRgb } from '@/shared/lib/huelab/gradientToRgb'
 import { Oklrch } from './Picker/oklrch'
+import { Input } from './Input'
 
 console.log(
   'gradientToRgb',
@@ -56,6 +57,7 @@ export function PickerWrapper() {
         background: `radial-gradient(70% 80% at 50% 72%, ${bgColor}, ${bgColor2})`,
       }}
     >
+      <Input />
       <div>{hex}</div>
       <HexPicker
         value={hex}
