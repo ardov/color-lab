@@ -20,7 +20,7 @@ console.log(
   ).map(stop => [formatHex(stop[0]), stop[1]])
 )
 
-export function PickerWrapper() {
+export default function PickerWrapper() {
   const [gamut, setGamut] = useState<Gamut>(Gamut.SRGB)
   const [hex, setHex] = useState('#ff00ff')
   const [intention, setIntention] = useState(null as Oklrch | null)

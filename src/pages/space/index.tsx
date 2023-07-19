@@ -28,7 +28,7 @@ const modes: Mode[] = [
   'LRGB',
 ]
 
-export function Spaces() {
+export default function Spaces() {
   // applyTheme(document.body, theme)
   const { sceneRef, matrix, setMatrix } = useDragRotation2(invertedY)
   const [transition, setTransition] = useState(0)

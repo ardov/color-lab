@@ -18,7 +18,7 @@ import { Mode, Rgb } from 'culori'
 import { ARButton, XR, useXR } from '@react-three/xr'
 import { GamutPlane } from './XRayPlane'
 
-export function Spaces3d() {
+export default function Spaces3d() {
   const morphState = useMorphState()
   const influences = useSpaceInfluence(morphState.state)
   const currentSpace =

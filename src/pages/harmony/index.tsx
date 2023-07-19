@@ -8,7 +8,7 @@ import { useState } from 'react'
 
 const theme = makeTheme({})
 
-export function Harmony() {
+export default function Harmony() {
   applyTheme(document.body, theme)
   const [hue, setHue] = useState(0)
   const [c, setChroma] = useState(0.4)

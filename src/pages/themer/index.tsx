@@ -1,1 +1,1 @@
-export { Themer } from './Themer'
+export { Themer as default } from './Themer'

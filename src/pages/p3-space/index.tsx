@@ -16,7 +16,7 @@ import { Pixels } from './Pixels'
 
 const theme = makeTheme({})
 
-export function P3Space() {
+export default function P3Space() {
   applyTheme(document.body, theme)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [hue, setHue] = useState(0)

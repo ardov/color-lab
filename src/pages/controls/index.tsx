@@ -7,7 +7,7 @@ type TValue = number | null
 
 const initialValues: TValue[] = [null, 10, null, null, 40, null, null]
 
-export const Sliders = () => {
+export default function Sliders() {
   const [values, setValues] = useState<TValue[]>(initialValues)
   const calculated = useMemo(() => interpolateValues(values), [values])
 
