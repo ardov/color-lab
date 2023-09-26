@@ -1,0 +1,47 @@
+.root {
+  --super-white: color(display-p3 170% 170% 170%);
+  --super-red: color(display-p3 170% 0% 0%);
+  --super-green: color(display-p3 0% 170% 0%);
+  --super-blue: color(display-p3 0% 0% 170%);
+  --super-yellow: color(display-p3 170% 170% 0%);
+  --super-cyan: color(display-p3 0% 170% 170%);
+  --super-magenta: color(display-p3 170% 0% 170%);
+  --super-bluish: color(display-p3 170% 130% 100%);
+
+  background-color: var(--super-white);
+  background-color: white;
+  // height: 100%;
+  height: 100vh;
+}
+
+.white-text {
+  background: var(--super-white);
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+
+.polygon {
+  --size: 20px;
+  --transform: none;
+  --color-a: red;
+  --color-b: green;
+  --color-c: blue;
+
+  position: absolute;
+  left: 0;
+  top: 80px;
+  /* clip-path: polygon(0 0, 100% 0%, 0 100%); */
+  mask-image: linear-gradient(135deg, #000 50.5%, transparent 50.5%);
+  width: var(--size);
+  height: var(--size);
+  transform-origin: 0% 0%;
+  // transition: 1500ms ease-in-out;
+  transform: var(--transform);
+
+  background: linear-gradient(135deg, var(--color-b), transparent 50%),
+    conic-gradient(from 90deg at 0% 0%,
+      var(--color-c) 0deg,
+      var(--color-a) 90deg);
+}

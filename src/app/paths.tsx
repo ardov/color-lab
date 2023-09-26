@@ -26,7 +26,7 @@ export const paths: {
   },
   {
     name: 'Harmony',
-    description: 'Generator of color harmonies',
+    description: 'Generator of color hues for errors, warnings, and successes',
     path: '/harmony',
     component: lazy(() => import('@/pages/harmony')),
   },
@@ -53,5 +53,11 @@ export const paths: {
     description: 'Color picker',
     path: '/picker',
     component: lazy(() => import('@/pages/picker')),
+  },
+  {
+    name: 'HDR',
+    description: 'Experiments with HDR color spaces',
+    path: '/hdr',
+    component: lazy(() => import('@/pages/hdr')),
   },
 ]

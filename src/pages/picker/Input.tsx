@@ -1,4 +1,13 @@
-import React, { useState, useCallback } from 'react'
+import {
+  Color,
+  formatCss,
+  formatHex,
+  formatHsl,
+  formatRgb,
+  parse,
+} from 'culori'
+import React, { useCallback, useState } from 'react'
+import { useArrowPress } from './useArrowPress'
 
 export const Input: React.FC<
   React.DetailedHTMLProps<
@@ -8,59 +17,7 @@ export const Input: React.FC<
 > = props => {
   const [inputValue, setInputValue] = useState('Sample 123 Text')
 
-  const onKeyPress = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      const { key, currentTarget, altKey, shiftKey } = event
-      if (key !== 'ArrowUp' && key !== 'ArrowDown') return
-
-      // ArrowUp and ArrowDown are handled here
-      event.preventDefault()
-      const step = altKey ? 0.1 : shiftKey ? 10 : 1
-      const sign = key === 'ArrowUp' ? 1 : -1
-      const change = sign * step
-
-      const currentValue = currentTarget.value
-      const caretStart = currentTarget.selectionStart || 0
-      const matchingInfo = getMathchingInfo(currentValue, caretStart)
-
-      if (!matchingInfo) return
-
-      const { number, start, end } = matchingInfo
-
-      const decimals = 1000000
-      const newNumber =
-        Math.round((parseFloat(number) + change) * decimals) / decimals
-      const newValue =
-        currentValue.slice(0, start) +
-        newNumber +
-        currentValue.slice(end, currentValue.length)
-
-      setInputValue(newValue)
-      window.requestAnimationFrame(() => {
-        currentTarget.setSelectionRange(
-          start,
-          start + newNumber.toString().length
-        )
-      })
-
-      function getMathchingInfo(value: string, caretPosition: number) {
-        const numberRegex = /[-+]?(\d+(\.\d*)?|\.\d+)/g
-        let match: RegExpExecArray | null = null
-        while ((match = numberRegex.exec(value))) {
-          const number = match[0]
-          const index = match.index
-          if (
-            index <= caretPosition &&
-            caretPosition <= index + number.length
-          ) {
-            return { number, start: index, end: index + number.length }
-          }
-        }
-        return null
-      }
-    },
-    []
-  )
+  const onKeyPress = useArrowPress(setInputValue)
 
   return (
     <input
@@ -70,4 +27,70 @@ export const Input: React.FC<
       onChange={event => setInputValue(event.target.value)}
     />
   )
+}
+
+export const ColorInput: React.FC<{
+  value: string
+  onChange: (event: { value: string; color: Color | null }) => void
+}> = props => {
+  const { value, onChange } = props
+
+  const [inputValue, setInputValue] = useState(value)
+  const [parsedColor, setParsedColor] = useState(parseColor(value))
+
+  const handleValueChange = useCallback(
+    (newValue: string) => {
+      setInputValue(newValue)
+      if (newValue === value) return
+      const parsed = parseColor(newValue)
+      setParsedColor(parsed)
+      onChange(
+        parsed
+          ? { value: newValue, color: parsed.color }
+          : { value: newValue, color: null }
+      )
+    },
+    [onChange, value]
+  )
+
+  const onKeyPress = useArrowPress(handleValueChange)
+
+  return (
+    <input
+      type="text"
+      value={inputValue}
+      onKeyDown={onKeyPress}
+      onChange={event => handleValueChange(event.target.value)}
+      onBlur={() => {
+        if (parsedColor) {
+          setInputValue(parsedColor.value)
+        }
+      }}
+    />
+  )
+}
+
+function parseColor(value: string) {
+  const parsed = parse(value)
+  if (parsed === undefined) return null
+
+  const formatter = getFormatter(value)
+
+  return {
+    color: parsed,
+    value: formatter(parsed),
+    formatter,
+  }
+
+  function getFormatter(value: string) {
+    if (isHex(value)) return formatHex
+    if (value.startsWith('rgb')) return formatRgb
+    if (value.startsWith('hsl')) return formatHsl
+    return formatCss
+  }
+
+  function isHex(value: string) {
+    const hexValue = value.startsWith('#') ? value.slice(1) : value
+    return /^([0-9A-Fa-f]{3}){1,2}$/.test(hexValue)
+  }
 }

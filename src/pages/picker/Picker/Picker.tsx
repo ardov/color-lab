@@ -1,4 +1,4 @@
-import { formatHex, parseHex } from 'culori'
+import { formatCss, formatHex, parse, parseHex } from 'culori'
 import { useCallback, useEffect } from 'react'
 
 import { useState } from 'react'
@@ -46,7 +46,7 @@ export function HexPicker(props: {
       value={intention}
       cssColor={hex}
       onColorChange={onIntentionChange}
-      gamut={Gamut.SRGB}
+      defaultGamut={Gamut.SRGB}
     />
   )
 }
@@ -72,7 +72,7 @@ function IntentionPicker(
   props: DivProps & {
     value: Oklrch
     cssColor?: string | null
-    gamut?: Gamut
+    defaultGamut?: Gamut
     onColorChange: (color: Oklrch) => void
   }
 ) {
@@ -80,14 +80,15 @@ function IntentionPicker(
     value,
     cssColor,
     onColorChange: onChange,
-    gamut = Gamut.SRGB,
+    defaultGamut = Gamut.SRGB,
     className,
     ...rest
   } = props
   const width = 280
   const height = 360
 
-  const handleKeyDown = useKeyControlls(value, onChange, gamut)
+  const [gamutState, setGamutState] = useState(defaultGamut)
+  const handleKeyDown = useKeyControlls(value, onChange, defaultGamut)
 
   return (
     <div
@@ -101,16 +102,131 @@ function IntentionPicker(
         lr={value.l}
         c={value.c}
         h={value.h || 0}
-        gamut={gamut}
+        gamut={gamutState}
         pointerColor={cssColor}
         onChange={(l, c) => onChange({ ...value, l, c })}
       />
-      <div style={{ padding: 8 }}>
+      <div className="pckr__addons">
         <HueSlider
           hue={value.h || 0}
           onChange={h => onChange({ ...value, h })}
         />
       </div>
+      <div className="pckr__addons">
+        <AxisFields value={value} gamut={gamutState} onChange={onChange} />
+        <IOField
+          value={value}
+          gamut={gamutState}
+          onChange={onChange}
+          onGamutChange={setGamutState}
+        />
+      </div>
+    </div>
+  )
+}
+
+const AxisFields = (props: {
+  value: Oklrch
+  gamut: Gamut
+  onChange: (value: Oklrch) => void
+}) => {
+  const { value, onChange, gamut } = props
+  return (
+    <div className="pckr__axis-fields">
+      <div className="pckr__axis-field">
+        <input
+          id="pckr__axis-field--l"
+          type="number"
+          value={round(value.l * 100, 1)}
+          onChange={e => {
+            let l = Number(e.target.value) / 100
+            if (l > 1) l = 1
+            if (l < 0) l = 0
+            onChange({ ...value, l })
+          }}
+        />
+        <label htmlFor="pckr__axis-field--l">L</label>
+      </div>
+      <div className="pckr__axis-field">
+        <input
+          id="pckr__axis-field--c"
+          type="number"
+          value={round((100 * value.c) / getMaxChroma(Gamut.SRGB), 1)}
+          min={0}
+          max={(100 * getMaxChroma(gamut)) / getMaxChroma(Gamut.SRGB)}
+          onChange={e => {
+            let c = (Number(e.target.value) / 100) * getMaxChroma(Gamut.SRGB)
+            if (c > getMaxChroma(gamut)) c = getMaxChroma(gamut)
+            if (c < 0) c = 0
+            onChange({ ...value, c })
+          }}
+        />
+        <label htmlFor="pckr__axis-field--c">C</label>
+      </div>
+      <div className="pckr__axis-field">
+        <input
+          id="pckr__axis-field--h"
+          type="number"
+          value={round(value.h || 0, 1)}
+          onChange={e => {
+            let h = Number(e.target.value) % 360
+            if (h < 0) h += 360
+            onChange({ ...value, h })
+          }}
+        />
+        <label htmlFor="pckr__axis-field--h">H</label>
+      </div>
+    </div>
+  )
+}
+
+const IOField = (props: {
+  value: Oklrch
+  gamut: Gamut
+  onChange: (value: Oklrch) => void
+  onGamutChange: (gamut: Gamut) => void
+}) => {
+  const { value, onChange, gamut, onGamutChange } = props
+  const valueHex =
+    gamut === Gamut.SRGB
+      ? formatHex(clampChroma(oklrchToOklch(value), Gamut.SRGB))
+      : formatCss(clampChroma(oklrchToOklch(value), gamut))
+
+  const [input, setInput] = useState<string>(valueHex)
+  const [inFocus, setInFocus] = useState(false)
+
+  useEffect(() => {
+    if (!inFocus) setInput(valueHex)
+  }, [inFocus, valueHex])
+
+  return (
+    <div className="pckr__axis-fields">
+      <div className="pckr__axis-field">
+        <input
+          id="pckr__io-field"
+          type="text"
+          value={input}
+          onFocus={() => setInFocus(true)}
+          onChange={e => {
+            setInput(e.target.value)
+            const color = strToOklrch(e.target.value)
+            if (color) onChange(color)
+          }}
+          onBlur={() => {
+            setInput(valueHex)
+            setInFocus(false)
+          }}
+          style={{ paddingLeft: 8 }}
+        />
+      </div>
+      <button
+        style={{ flexGrow: 0 }}
+        onClick={() => {
+          onGamutChange(gamut === Gamut.SRGB ? Gamut.P3 : Gamut.SRGB)
+        }}
+      >
+        {gamut}
+      </button>
     </div>
   )
 }
@@ -130,6 +246,8 @@ function useKeyControlls(
 ) {
   return useCallback(
     (e: React.KeyboardEvent) => {
+      // Skip if input is focused
+      if (e.target instanceof HTMLInputElement) return
       const lStep = 0.01
       const cStep = 0.005
       const hStep = 0.5
@@ -164,4 +282,21 @@ function useKeyControlls(
     },
     [gamut, onChange, value]
   )
+}
+
+/**
+ * Round a number to a given number of decimals
+ * @param value
+ * @param decimals
+ * @returns
+ */
+function round(value: number, decimals = 0) {
+  const factor = Math.pow(10, decimals)
+  return Math.round(value * factor) / factor
+}
+
+function strToOklrch(str: string): Oklrch | null {
+  const color = parse(str)
+  if (!color) return null
+  return oklrch(color)
 }

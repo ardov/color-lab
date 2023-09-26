@@ -2,9 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "baseUrl": "src",
-    "paths": {
-      "@/*": ["*"]
-    },
+    "paths": { "@/*": ["*"] },
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],

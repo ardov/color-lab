@@ -76,7 +76,8 @@ function mergePairs(stops: ColorStop[][]) {
 }
 
 /**
- * Computes color difference in Oklab color space with non-HDR transfer function applied */
+ * Computes color difference in Oklab color space with non-HDR transfer function applied
+ */
 function oklrabDifference(colorA: Color, colorB: Color) {
   const oklabA = oklab(colorA)
   const oklabB = oklab(colorB)

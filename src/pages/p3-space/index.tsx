@@ -37,7 +37,7 @@ export default function P3Space() {
           min={0}
           max={360}
           value={[hue]}
-          step={0.1}
+          step={0.0001}
           onValueChange={value => setHue(value[0])}
         />
       </label>

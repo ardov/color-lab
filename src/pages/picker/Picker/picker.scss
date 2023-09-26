@@ -8,6 +8,7 @@
 }
 
 .pckr__wrapper {
+  width: 280px;
   display: flex;
   flex-direction: column;
   background-color: black;
@@ -56,6 +57,72 @@
 .pckr__canvas {
   border-radius: 16px 16px 0 0;
 }
+
+.pckr__addons {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 16px;
+}
+
+.pckr__axis-fields {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 1px;
+
+  &>* {
+    flex-grow: 1;
+    width: 100%;
+    flex-shrink: 1;
+  }
+}
+
+.pckr__axis-field {
+  position: relative;
+  color: #fff;
+
+  &:first-child input {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  &:last-child input {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  label {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    font-size: 16px;
+    line-height: 32px;
+    color: rgb(255 255 255 /1);
+  }
+
+  input {
+    width: 100%;
+    padding: 0 0 0 28px;
+    border-radius: 2px;
+    border: none;
+    font-size: 16px;
+    line-height: 32px;
+    color: rgb(255 255 255);
+    background-color: rgb(255 255 255 /0.16);
+
+    // Remove arrows from number input
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
 
 .pckr__hue-slider {
   position: relative;

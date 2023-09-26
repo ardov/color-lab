@@ -9,6 +9,7 @@ import { betterToeInv, clampChroma } from '@/shared/lib/huelab'
 import './polyfill.js'
 import { Pixels } from './Pixels'
 import { Gamut, getMaxChroma } from './shared'
+import { oklchDisplayable } from '@/shared/lib/huelab/getDisplayable'
 
 export const Canvas: FC<{
   hue: number
@@ -86,16 +87,26 @@ function getHueSlice(props: {
         continue
       }
       const color = getColor(x / (width - 1), y / (height - 1))
-      const pix = toRGBA(toRGB(color, gamut))
-      if (displayableRGBA(pix)) {
-        pixels.set(x, y, pix)
-      } else {
-        if (!cuspColor) {
-          const ok = clampChroma(oklch(color), gamut)
-          cuspColor = toRGBA(toRGB(ok, gamut))
-        }
-        pixels.set(x, y, cuspColor)
+      const col = oklchDisplayable(color)
+      if (col) {
+        pixels.set(x, y, toRGBA(toRGB(col, gamut)))
+        continue
       }
+
+      const ok = clampChroma(color, gamut)
+      cuspColor = toRGBA(toRGB(ok, gamut))
+      pixels.set(x, y, cuspColor)
+
+      // const pix = toRGBA(toRGB(color, gamut))
+      // if (displayableRGBA(pix)) {
+      //   pixels.set(x, y, pix)
+      // } else {
+      //   if (!cuspColor) {
+      //     const ok = clampChroma(oklch(color), gamut)
+      //     cuspColor = toRGBA(toRGB(ok, gamut))
+      //   }
+      //   pixels.set(x, y, cuspColor)
+      // }
     }
   }
   return pixels.toImageBitmap({ colorSpace: gamut })

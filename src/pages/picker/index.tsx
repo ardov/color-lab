@@ -7,23 +7,24 @@ import { Gamut } from './Picker/shared'
 import { HexPicker } from './Picker'
 import { gradientToRgb } from '@/shared/lib/huelab/gradientToRgb'
 import { Oklrch } from './Picker/oklrch'
-import { Input } from './Input'
+import { ColorInput, Input } from './Input'
 
-console.log(
-  'gradientToRgb',
-  gradientToRgb(
-    [
-      ['#000', 0],
-      ['#fff', 1],
-    ],
-    'oklch'
-  ).map(stop => [formatHex(stop[0]), stop[1]])
-)
+// console.log(
+//   'gradientToRgb',
+//   gradientToRgb(
+//     [
+//       ['#000', 0],
+//       ['#fff', 1],
+//     ],
+//     'oklch'
+//   ).map(stop => [formatHex(stop[0]), stop[1]])
+// )
 
 export default function PickerWrapper() {
   const [gamut, setGamut] = useState<Gamut>(Gamut.SRGB)
-  const [hex, setHex] = useState('#ff00ff')
+  const [hex, setHex] = useState('#0000ff')
   const [intention, setIntention] = useState(null as Oklrch | null)
+  const [val, setVal] = useState('#ff00ff')
 
   const h = intention?.h || 0
 
@@ -57,8 +58,19 @@ export default function PickerWrapper() {
         background: `radial-gradient(70% 80% at 50% 72%, ${bgColor}, ${bgColor2})`,
       }}
     >
-      <Input />
-      <div>{hex}</div>
+      {/* <Input />
+      <ColorInput
+        value={val}
+        onChange={e => {
+          console.log(e)
+
+          setVal(e.value || '')
+          if (e.color) {
+            setHex(formatHex(e.color))
+          }
+        }}
+      /> */}
+
       <HexPicker
         value={hex}
         onChange={e => {
