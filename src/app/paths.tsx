@@ -54,10 +54,10 @@ export const paths: {
     path: '/picker',
     component: lazy(() => import('@/pages/picker')),
   },
-  {
-    name: 'HDR',
-    description: 'Experiments with HDR color spaces',
-    path: '/hdr',
-    component: lazy(() => import('@/pages/hdr')),
-  },
+  // {
+  //   name: 'HDR',
+  //   description: 'Experiments with HDR color spaces',
+  //   path: '/hdr',
+  //   component: lazy(() => import('@/pages/hdr')),
+  // },
 ]
