@@ -1,1 +1,1 @@
-export { Splitter } from './Splitter'
+export { Splitter as default } from './Splitter'

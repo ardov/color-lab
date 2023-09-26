@@ -1,0 +1,144 @@
+.picker-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: gray;
+}
+
+.pckr__wrapper {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  background-color: black;
+  border-radius: 16px;
+}
+
+.pckr__interactive {
+  position: relative;
+  border-radius: 16px 16px 0 0;
+  outline: none;
+  /* Don't trigger the default scrolling behavior when the event is originating from this element */
+  touch-action: none;
+}
+
+.pckr__pointer {
+  --top: 0.5;
+  --left: 0.5;
+  --color: #fff;
+  --ring: hsl(0deg 0% 12%);
+  --outline: hsl(0deg 0% 100% / 0.25);
+
+  --size: 32px;
+  --offset: 12px;
+
+  position: absolute;
+  top: calc(var(--top) * calc(100% - var(--offset) * 2) + var(--offset));
+  left: calc(var(--left) * calc(100% - var(--offset) * 2) + var(--offset));
+  z-index: 1;
+  box-sizing: border-box;
+  width: var(--size);
+  height: var(--size);
+  transform: translate(-50%, -50%);
+  background-color: var(--color);
+  // border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--ring);
+  transition: outline 0.2s ease-in-out;
+}
+
+.pckr__interactive:focus .pckr__pointer {
+  outline: 3px solid var(--outline);
+  outline-offset: 2px;
+  // transform: translate(-50%, -50%) scale(1.1);
+}
+
+.pckr__canvas {
+  border-radius: 16px 16px 0 0;
+}
+
+.pckr__addons {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 16px;
+}
+
+.pckr__axis-fields {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 1px;
+
+  &>* {
+    flex-grow: 1;
+    width: 100%;
+    flex-shrink: 1;
+  }
+}
+
+.pckr__axis-field {
+  position: relative;
+  color: #fff;
+
+  &:first-child input {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  &:last-child input {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  label {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    font-size: 16px;
+    line-height: 32px;
+    color: rgb(255 255 255 /1);
+  }
+
+  input {
+    width: 100%;
+    padding: 0 0 0 28px;
+    border-radius: 2px;
+    border: none;
+    font-size: 16px;
+    line-height: 32px;
+    color: rgb(255 255 255);
+    background-color: rgb(255 255 255 /0.16);
+
+    // Remove arrows from number input
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+
+.pckr__hue-slider {
+  position: relative;
+  border-radius: 8px;
+  width: 100%;
+  height: 32px;
+  background: linear-gradient(to right,
+      rgb(255, 125, 170),
+      rgb(255, 135, 103),
+      rgb(235, 154, 0),
+      rgb(185, 180, 0),
+      rgb(0, 210, 45),
+      rgb(0, 201, 177),
+      rgb(0, 194, 227),
+      rgb(108, 178, 255),
+      rgb(170, 159, 255),
+      rgb(242, 111, 255),
+      rgb(255, 125, 170));
+}

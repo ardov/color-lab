@@ -1,4 +1,4 @@
-import { RGBA } from '@/shared/lib/huelab'
+export type RGBA = [number, number, number, number]
 
 /**
  * Set of pixels with convenient interface
@@ -16,7 +16,7 @@ export class Pixels {
 
   /** Set pixel value */
   set = (x: number, y: number, [r, g, b, a]: RGBA = [0, 0, 0, 0]) => {
-    const start = (this.height - y) * this.width * 4 + x * 4
+    const start = (this.height - 1 - y) * this.width * 4 + x * 4
     this.data[start] = r
     this.data[start + 1] = g
     this.data[start + 2] = b

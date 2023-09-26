@@ -16,7 +16,7 @@ import { Pixels } from './Pixels'
 
 const theme = makeTheme({})
 
-export function P3Space() {
+export default function P3Space() {
   applyTheme(document.body, theme)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [hue, setHue] = useState(0)
@@ -37,7 +37,7 @@ export function P3Space() {
           min={0}
           max={360}
           value={[hue]}
-          step={0.1}
+          step={0.0001}
           onValueChange={value => setHue(value[0])}
         />
       </label>

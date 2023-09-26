@@ -77,7 +77,7 @@ export function makeColors(
       : lerp(hue + hueShift, hue, l)
   }
 
-  console.log('Hue', themeType, getHue(0), getHue(1))
+  // console.log('Hue', themeType, getHue(0), getHue(1))
 
   const lowC = Math.min(chroma, 0.08)
 
