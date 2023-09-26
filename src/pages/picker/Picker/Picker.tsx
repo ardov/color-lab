@@ -6,7 +6,7 @@ import { clampChroma } from '@/shared/lib/huelab'
 import { HueSlider } from './HueSlider'
 import { LCPanel } from './LCPanel'
 import { Gamut, getMaxChroma } from './shared'
-import './Picker.scss'
+import './picker.scss'
 import { oklrch, Oklrch, oklrchToOklch } from './oklrch'
 import { clamp } from './Touchpad'
 
