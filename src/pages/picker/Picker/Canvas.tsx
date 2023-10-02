@@ -3,7 +3,7 @@ import type { FC } from 'react'
 import type { RGBA } from './Pixels'
 
 import { useEffect, useRef } from 'react'
-import { oklch, p3, rgb } from 'culori'
+import { p3, rgb } from 'culori'
 import { betterToeInv, clampChroma } from '@/shared/lib/huelab'
 
 import './polyfill.js'
@@ -84,9 +84,14 @@ function getHueSlice(props: {
     for (let x = 0; x < width; x++) {
       if (cuspColor) {
         pixels.set(x, y, cuspColor)
+        // pixels.set(x, y, [0, 0, 0, 255])
         continue
       }
       const color = getColor(x / (width - 1), y / (height - 1))
+
+      // pixels.set(x, y, toRGBA(clampChannels(color, gamut)))
+      // continue
+
       const col = oklchDisplayable(color)
       if (col) {
         pixels.set(x, y, toRGBA(toRGB(col, gamut)))
@@ -96,17 +101,7 @@ function getHueSlice(props: {
       const ok = clampChroma(color, gamut)
       cuspColor = toRGBA(toRGB(ok, gamut))
       pixels.set(x, y, cuspColor)
-
-      // const pix = toRGBA(toRGB(color, gamut))
-      // if (displayableRGBA(pix)) {
-      //   pixels.set(x, y, pix)
-      // } else {
-      //   if (!cuspColor) {
-      //     const ok = clampChroma(oklch(color), gamut)
-      //     cuspColor = toRGBA(toRGB(ok, gamut))
-      //   }
-      //   pixels.set(x, y, cuspColor)
-      // }
+      // pixels.set(x, y, [0, 0, 0, 255])
     }
   }
   return pixels.toImageBitmap({ colorSpace: gamut })

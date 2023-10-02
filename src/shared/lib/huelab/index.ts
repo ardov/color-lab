@@ -4,6 +4,7 @@ export {
   blendColors,
   getAlphaColor,
   clampChroma,
+  clampChannels,
   adjustL,
   adjustContrast,
 } from './colors'

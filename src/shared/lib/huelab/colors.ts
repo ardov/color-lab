@@ -1,5 +1,5 @@
 import type { Color, Oklch, Rgb } from 'culori'
-import { oklch, parse } from 'culori'
+import { oklch, p3, parse, rgb } from 'culori'
 import { findLowest, findHighest } from './binarySearch'
 import { displayable } from './displayable'
 import { apcaContrast } from './contrast'
@@ -22,7 +22,7 @@ export function blendColors(low: Rgb, top: Rgb): Rgb {
 }
 
 /**
- * Returns color with opacity that would look exactly
+ * Returns color with opacity that would look exactly like target color on given background
  * @param bg background color
  * @param target color that we want to imitate with opacity
  * @returns
@@ -62,6 +62,17 @@ export function clampChroma(
   if (displayable(okColor, mode)) return okColor
   let c = findHighest(c => displayable({ ...okColor, c }, mode), [0, 0.4])
   return { ...okColor, c } as Oklch
+}
+
+export function clampChannels(
+  color: Color,
+  mode: 'srgb' | 'display-p3' = 'srgb'
+) {
+  const rgbColor = mode === 'srgb' ? rgb(color) : p3(color)
+  rgbColor.r = Math.max(0, Math.min(1, rgbColor.r))
+  rgbColor.g = Math.max(0, Math.min(1, rgbColor.g))
+  rgbColor.b = Math.max(0, Math.min(1, rgbColor.b))
+  return rgbColor
 }
 
 export function adjustL(
