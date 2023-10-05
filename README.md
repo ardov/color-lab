@@ -1,4 +1,4 @@
-# Color Lab
+# [Color Lab](https://lab.ardov.me/)
 
 ⚠️ **This is a work in progress.** ⚠️
 
