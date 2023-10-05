@@ -13,4 +13,4 @@ Expect the code in this repository to be
 
 Also "something changed" is a completely valid commit message in this land.
 
-If you are not afraid of all of this, welcome to my color lab 🌈
+If you are still not afraid, welcome to my color lab 🌈

@@ -24,8 +24,11 @@ export default function List() {
         backgroundColor: 'var(--c-main-base)',
       }}
     >
-      <h1>Ardov Color Lab</h1>
-      <p>It's a place for my experiments, ideas and undercooked stuff.</p>
+      <h1>Ardov's Color Lab</h1>
+      <p>
+        It's a place for my experiments, ideas and undercooked stuff.{' '}
+        <a href="https://github.com/ardov/color-lab">Messy source code</a>
+      </p>
       <ul>
         {paths.map(({ path, name, description }) => (
           <li key={path}>
