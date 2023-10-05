@@ -9,7 +9,7 @@ import { betterToeInv, clampChroma } from '@/shared/lib/huelab'
 import './polyfill.js'
 import { Pixels } from './Pixels'
 import { Gamut, getMaxChroma } from './shared'
-import { oklchDisplayable } from '@/shared/lib/huelab/getDisplayable'
+import { oklchDisplayable } from '@/shared/lib/huelab/oklch/getDisplayable'
 
 export const Canvas: FC<{
   hue: number
@@ -92,7 +92,7 @@ function getHueSlice(props: {
       // pixels.set(x, y, toRGBA(clampChannels(color, gamut)))
       // continue
 
-      const col = oklchDisplayable(color)
+      const col = oklchDisplayable(color, gamut)
       if (col) {
         pixels.set(x, y, toRGBA(toRGB(col, gamut)))
         continue

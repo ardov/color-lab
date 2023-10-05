@@ -2,10 +2,10 @@ import { Color, p3, rgb } from 'culori'
 
 export function displayable(
   color: Color | string,
-  mode: 'srgb' | 'display-p3' = 'srgb',
+  gamut: 'srgb' | 'display-p3' = 'srgb',
   tolerance = 0
 ): boolean {
-  const c = mode === 'srgb' ? rgb(color) : p3(color)
+  const c = gamut === 'srgb' ? rgb(color) : p3(color)
   const min = 0 - tolerance
   const max = 1 + tolerance
   return (
