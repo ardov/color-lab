@@ -1,7 +1,4 @@
-export enum Gamut {
-  SRGB = 'srgb',
-  P3 = 'display-p3',
-}
+export type Gamut = 'srgb' | 'display-p3'
 
 /**
  * Magenta is the most saturated OKLCH color in sRGB gamut
@@ -17,6 +14,6 @@ const MAX_SRGB_CHROMA = 0.323
  */
 const MAX_P3_CHROMA = 0.369
 
-export const getMaxChroma = (mode: Gamut) => {
-  return mode === Gamut.SRGB ? MAX_SRGB_CHROMA : MAX_P3_CHROMA
+export const getMaxChroma = (gamut: Gamut) => {
+  return gamut === 'srgb' ? MAX_SRGB_CHROMA : MAX_P3_CHROMA
 }

@@ -22,7 +22,7 @@ export const LCPanel: FC<{
     lr,
     c,
     h,
-    gamut = Gamut.SRGB,
+    gamut = 'srgb',
     pointerColor,
     children,
     onChange,

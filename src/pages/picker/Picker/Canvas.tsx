@@ -18,7 +18,7 @@ export const Canvas: FC<{
   gamut?: Gamut
   className?: string
 }> = props => {
-  const { width, height, hue, gamut = Gamut.SRGB, className } = props
+  const { width, height, hue, gamut = 'srgb', className } = props
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const cbRef = useRef<number>()
@@ -92,6 +92,7 @@ function getHueSlice(props: {
       // pixels.set(x, y, toRGBA(clampChannels(color, gamut)))
       // continue
 
+      // @ts-expect-error TS don't like my gamut handling 🤷🏻‍♂️
       const col = oklchDisplayable(color, gamut)
       if (col) {
         pixels.set(x, y, toRGBA(toRGB(col, gamut)))
@@ -108,7 +109,7 @@ function getHueSlice(props: {
 }
 
 function toRGB(color: Color, gamut: Gamut) {
-  return gamut === Gamut.P3 ? p3(color) : rgb(color)
+  return gamut === 'display-p3' ? p3(color) : rgb(color)
 }
 
 const toRGBA = (c: P3 | Rgb): RGBA => [

@@ -46,7 +46,7 @@ export function HexPicker(props: {
       value={intention}
       cssColor={hex}
       onColorChange={onIntentionChange}
-      defaultGamut={Gamut.SRGB}
+      defaultGamut={'srgb'}
     />
   )
 }
@@ -60,7 +60,7 @@ function toOklrch(hex: string): Oklrch {
   return oklrch(parseHex(hex))
 }
 function toHex(oklrch: Oklrch): string {
-  return formatHex(clampChroma(oklrchToOklch(oklrch), Gamut.SRGB))
+  return formatHex(clampChroma(oklrchToOklch(oklrch), 'srgb'))
 }
 
 type DivProps = React.DetailedHTMLProps<
@@ -80,7 +80,7 @@ function IntentionPicker(
     value,
     cssColor,
     onColorChange: onChange,
-    defaultGamut = Gamut.SRGB,
+    defaultGamut = 'srgb',
     className,
     ...rest
   } = props
@@ -151,11 +151,11 @@ const AxisFields = (props: {
         <input
           id="pckr__axis-field--c"
           type="number"
-          value={round((100 * value.c) / getMaxChroma(Gamut.SRGB), 1)}
+          value={round((100 * value.c) / getMaxChroma('srgb'), 1)}
           min={0}
-          max={(100 * getMaxChroma(gamut)) / getMaxChroma(Gamut.SRGB)}
+          max={(100 * getMaxChroma(gamut)) / getMaxChroma('srgb')}
           onChange={e => {
-            let c = (Number(e.target.value) / 100) * getMaxChroma(Gamut.SRGB)
+            let c = (Number(e.target.value) / 100) * getMaxChroma('srgb')
             if (c > getMaxChroma(gamut)) c = getMaxChroma(gamut)
             if (c < 0) c = 0
             onChange({ ...value, c })
@@ -188,8 +188,8 @@ const IOField = (props: {
 }) => {
   const { value, onChange, gamut, onGamutChange } = props
   const valueHex =
-    gamut === Gamut.SRGB
-      ? formatHex(clampChroma(oklrchToOklch(value), Gamut.SRGB))
+    gamut === 'srgb'
+      ? formatHex(clampChroma(oklrchToOklch(value), 'srgb'))
       : formatCss(clampChroma(oklrchToOklch(value), gamut))
 
   const [input, setInput] = useState<string>(valueHex)
@@ -222,7 +222,7 @@ const IOField = (props: {
       <button
         style={{ flexGrow: 0 }}
         onClick={() => {
-          onGamutChange(gamut === Gamut.SRGB ? Gamut.P3 : Gamut.SRGB)
+          onGamutChange(gamut === 'srgb' ? 'display-p3' : 'srgb')
         }}
       >
         {gamut}
