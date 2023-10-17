@@ -1,8 +1,9 @@
 import type { Color, Oklch, Rgb } from 'culori'
 import { oklch, p3, parse, rgb } from 'culori'
 import { findLowest, findHighest } from './binarySearch'
-import { displayable } from './displayable'
 import { apcaContrast } from './contrast'
+import { oklchDisplayable } from './oklch/getDisplayable'
+import { getMaxChroma } from './oklch/getMaxChroma'
 
 /** Blends two colors according to their alpha */
 export function blendColors(low: Rgb, top: Rgb): Rgb {
@@ -56,11 +57,11 @@ export function getAlphaColor(bg: Rgb, target: Rgb): Rgb {
 
 export function clampChroma(
   color: Color,
-  mode: 'srgb' | 'display-p3' = 'srgb'
+  gamut: 'srgb' | 'display-p3' = 'srgb'
 ) {
   const okColor = oklch(color)
-  if (displayable(okColor, mode)) return okColor
-  let c = findHighest(c => displayable({ ...okColor, c }, mode), [0, 0.4])
+  if (oklchDisplayable(okColor, gamut)) return okColor
+  let c = getMaxChroma(okColor.l, okColor.h || 0, gamut)
   return { ...okColor, c } as Oklch
 }
 

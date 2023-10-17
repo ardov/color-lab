@@ -1,4 +1,4 @@
-import { Color, Oklch, oklch, rgb } from 'culori'
+import { Color, Oklch, Rgb, oklch, rgb } from 'culori'
 import { displayable } from '../displayable'
 import { findHighest } from '../binarySearch'
 import { oklchDisplayable } from './getDisplayable'
@@ -19,7 +19,7 @@ function clampChromaToSrgb(color: Color) {
       const newColor = { ...okColor, c }
       const displayable = oklchDisplayable(newColor, 'srgb')
       if (displayable) {
-        lastRgbColor = displayable
+        lastRgbColor = displayable as Rgb
         return true
       }
       return false

@@ -5,6 +5,7 @@ export const paths: {
   description: string
   path: string
   component: React.LazyExoticComponent<React.ComponentType<any>>
+  hidden?: boolean
 }[] = [
   {
     name: 'Themer',
@@ -53,6 +54,13 @@ export const paths: {
     description: 'Color picker',
     path: '/picker',
     component: lazy(() => import('@/pages/picker')),
+  },
+  {
+    name: 'Math stuff',
+    description: 'console logging mostly',
+    path: '/calculations',
+    component: lazy(() => import('@/pages/calculations')),
+    hidden: true,
   },
   // {
   //   name: 'HDR',

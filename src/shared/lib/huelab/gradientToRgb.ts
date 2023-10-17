@@ -34,7 +34,7 @@ function resolvePair(
   const colorA = toMode(rawColorA)
   const colorB = toMode(rawColorB)
 
-  if (positionB <= positionA || oklrabDifference(colorA, colorB) <= treshold) {
+  if (positionB <= positionA || okDistance(colorA, colorB) <= treshold) {
     return [
       [colorA, positionA],
       [colorB, positionB],
@@ -47,7 +47,7 @@ function resolvePair(
     'rgb'
   )(0.5)
 
-  if (oklrabDifference(middleColor, middleColorRgb) <= treshold) {
+  if (okDistance(middleColor, middleColorRgb) <= treshold) {
     return [
       [colorA, positionA],
       [colorB, positionB],
@@ -78,7 +78,7 @@ function mergePairs(stops: ColorStop[][]) {
 /**
  * Computes color difference in Oklab color space with non-HDR transfer function applied
  */
-function oklrabDifference(colorA: Color, colorB: Color) {
+function okDistance(colorA: Color, colorB: Color) {
   const oklabA = oklab(colorA)
   const oklabB = oklab(colorB)
 

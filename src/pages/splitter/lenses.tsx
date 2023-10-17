@@ -70,7 +70,7 @@ export const lenses: { name: string; lense: TLense }[] = [
 
       //  minimal chroma improvement that will be counted
       const minImprovement = 0.02
-      const okColor = oklch(fromRGBA(color))
+      const okColor = oklch(fromRGBA(color, 'srgb'))
       const canBeImproved = displayable(
         {
           ...okColor,

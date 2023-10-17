@@ -5,12 +5,17 @@ import { displayable } from '../displayable'
 import { clampRgb } from './clampRgb'
 
 /**
- * Returns displayable RGB color if possible, otherwise false
+ * Returns displayable RGB color if possible, otherwise false.
+ * Takes into account glitch region.
  * @param color Oklch color
  * @param gamut Gamut to check against
  */
 function oklchDisplayable(color: Oklch, gamut: 'srgb'): Rgb | false
 function oklchDisplayable(color: Oklch, gamut: 'display-p3'): P3 | false
+function oklchDisplayable(
+  color: Oklch,
+  gamut: 'srgb' | 'display-p3'
+): Rgb | P3 | false
 function oklchDisplayable(
   color: Oklch,
   gamut: 'srgb' | 'display-p3' = 'srgb'

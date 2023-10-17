@@ -2,8 +2,9 @@ import { Color, p3, P3, rgb, Rgb } from 'culori'
 
 export type RGBA = [number, number, number, number]
 
-// export function fromRGBA(color: RGBA, mode: 'srgb'): Rgb
-// export function fromRGBA(color: RGBA, mode: 'display-p3'): P3
+export function fromRGBA(color: RGBA, mode: 'srgb'): Rgb
+export function fromRGBA(color: RGBA, mode: 'display-p3'): P3
+export function fromRGBA(color: RGBA, mode: PredefinedColorSpace): P3 | Rgb
 export function fromRGBA(
   color: RGBA,
   mode: PredefinedColorSpace = 'srgb'

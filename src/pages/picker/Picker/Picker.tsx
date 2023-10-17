@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { clampChroma } from '@/shared/lib/huelab'
 import { HueSlider } from './HueSlider'
 import { LCPanel } from './LCPanel'
-import { Gamut, getMaxChroma } from './shared'
+import { Gamut, MAX_GAMUT_CHROMA } from './shared'
 import './picker.scss'
 import { oklrch, Oklrch, oklrchToOklch } from './oklrch'
 import { clamp } from './Touchpad'
@@ -151,12 +151,12 @@ const AxisFields = (props: {
         <input
           id="pckr__axis-field--c"
           type="number"
-          value={round((100 * value.c) / getMaxChroma('srgb'), 1)}
+          value={round((100 * value.c) / MAX_GAMUT_CHROMA['srgb'], 1)}
           min={0}
-          max={(100 * getMaxChroma(gamut)) / getMaxChroma('srgb')}
+          max={(100 * MAX_GAMUT_CHROMA[gamut]) / MAX_GAMUT_CHROMA['srgb']}
           onChange={e => {
-            let c = (Number(e.target.value) / 100) * getMaxChroma('srgb')
-            if (c > getMaxChroma(gamut)) c = getMaxChroma(gamut)
+            let c = (Number(e.target.value) / 100) * MAX_GAMUT_CHROMA['srgb']
+            if (c > MAX_GAMUT_CHROMA[gamut]) c = MAX_GAMUT_CHROMA[gamut]
             if (c < 0) c = 0
             onChange({ ...value, c })
           }}
@@ -263,13 +263,13 @@ function useKeyControlls(
         case 'KeyA':
           onChange({
             ...value,
-            c: clamp(value.c - cStep * multiplier, 0, getMaxChroma(gamut)),
+            c: clamp(value.c - cStep * multiplier, 0, MAX_GAMUT_CHROMA[gamut]),
           })
           break
         case 'KeyD':
           onChange({
             ...value,
-            c: clamp(value.c + cStep * multiplier, 0, getMaxChroma(gamut)),
+            c: clamp(value.c + cStep * multiplier, 0, MAX_GAMUT_CHROMA[gamut]),
           })
           break
         case 'KeyQ':

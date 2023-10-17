@@ -1,15 +1,10 @@
-import type { Color, Oklch, P3, Rgb } from 'culori'
 import type { FC } from 'react'
-import type { RGBA } from './Pixels'
 
 import { useEffect, useRef } from 'react'
-import { p3, rgb } from 'culori'
-import { betterToeInv, clampChroma } from '@/shared/lib/huelab'
 
 import './polyfill.js'
-import { Pixels } from './Pixels'
-import { Gamut, getMaxChroma } from './shared'
-import { oklchDisplayable } from '@/shared/lib/huelab/oklch/getDisplayable'
+import { Gamut } from './shared'
+import { getHueSlice } from './getHueSlice.js'
 
 export const Canvas: FC<{
   hue: number
@@ -58,67 +53,4 @@ export const Canvas: FC<{
       className={className}
     />
   )
-}
-
-// ————————————————————————————————————————————————————————————————————————
-// HELPERS
-// ————————————————————————————————————————————————————————————————————————
-
-function getHueSlice(props: {
-  width: number
-  height: number
-  gamut: Gamut
-  hue: number
-}) {
-  const { width, height, hue, gamut } = props
-  const getColor = (x: number, y: number): Oklch => ({
-    mode: 'oklch',
-    l: betterToeInv(y),
-    c: x * getMaxChroma(gamut),
-    h: hue,
-  })
-  const pixels = new Pixels(width, height)
-  for (let y = 0; y < height; y++) {
-    let cuspColor = null as RGBA | null
-
-    for (let x = 0; x < width; x++) {
-      if (cuspColor) {
-        pixels.set(x, y, cuspColor)
-        // pixels.set(x, y, [0, 0, 0, 255])
-        continue
-      }
-      const color = getColor(x / (width - 1), y / (height - 1))
-
-      // pixels.set(x, y, toRGBA(clampChannels(color, gamut)))
-      // continue
-
-      // @ts-expect-error TS don't like my gamut handling 🤷🏻‍♂️
-      const col = oklchDisplayable(color, gamut)
-      if (col) {
-        pixels.set(x, y, toRGBA(toRGB(col, gamut)))
-        continue
-      }
-
-      const ok = clampChroma(color, gamut)
-      cuspColor = toRGBA(toRGB(ok, gamut))
-      pixels.set(x, y, cuspColor)
-      // pixels.set(x, y, [0, 0, 0, 255])
-    }
-  }
-  return pixels.toImageBitmap({ colorSpace: gamut })
-}
-
-function toRGB(color: Color, gamut: Gamut) {
-  return gamut === 'display-p3' ? p3(color) : rgb(color)
-}
-
-const toRGBA = (c: P3 | Rgb): RGBA => [
-  Math.round(c.r * 255),
-  Math.round(c.g * 255),
-  Math.round(c.b * 255),
-  255,
-]
-
-function displayableRGBA(c: RGBA) {
-  return c.every(val => val >= 0 && val <= 255.00001)
 }

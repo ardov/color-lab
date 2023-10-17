@@ -1,27 +1,12 @@
 import { betterToeInv, clampChroma } from '@/shared/lib/huelab'
-import { formatCss, formatHex, hsl, Oklch, oklch, parseHex } from 'culori'
+import { formatHex, Oklch, oklch, parseHex } from 'culori'
 import { useState } from 'react'
 
 import './styles.scss'
 import { Gamut } from './Picker/shared'
 import { HexPicker } from './Picker'
-import { gradientToRgb } from '@/shared/lib/huelab/gradientToRgb'
 import { Oklrch } from './Picker/oklrch'
 import { ColorInput, Input } from './Input'
-
-// console.log(
-//   'gradientToRgb',
-//   gradientToRgb(
-//     [
-//       ['#000', 0],
-//       ['#fff', 1],
-//     ],
-//     'oklch'
-//   ).map(stop => [formatHex(stop[0]), stop[1]])
-// )
-
-printHues()
-// printAngDiff()
 
 export default function PickerWrapper() {
   const [gamut, setGamut] = useState<Gamut>('srgb')
@@ -132,47 +117,4 @@ function makeHueGradient(
     })
     .map(formatHex)
   return `linear-gradient(to right, ${colors.join(', ')})`
-}
-
-function printHues() {
-  const step = 1
-  const treshold = 0.05
-  const colors = new Array(360 / step).fill(0).map((_, i) => {
-    const h = i * step
-    return oklch({ mode: 'hsl', h, l: 0.5, s: 1 })
-  })
-  colors.forEach((color, i, arr) => {
-    const hslHue = i * step
-    const oklchHue = color.h!
-    const prevH = i === 0 ? arr[arr.length - 1].h! : arr[i - 1].h!
-    const nextH = i === arr.length - 1 ? arr[0].h! : arr[i + 1].h!
-    const predictedH = (prevH + nextH) / 2
-    const error = Math.abs(oklchHue - predictedH)
-
-    const angleDiff = oklchHue - prevH
-    console.log(
-      `${hslHue.toFixed(1).padStart(5, ' ')}°`,
-      // color.h?.toFixed(5),
-      'diff ',
-      // error > treshold ? '❌ ' + error : '✅'
-      // color
-      100 * angleDiff,
-      color
-    )
-  })
-}
-
-function printAngDiff() {
-  const bits = 8
-  const steps = 2 ** bits
-  const step = 1 / steps
-  const hues = new Array(steps).fill(0).map((_, i) => {
-    const hslColor = hsl({ mode: 'rgb', r: i * step, g: 1, b: 0 })
-    return hslColor.h!
-  })
-  hues.forEach((hue, i, arr) => {
-    const prevHue = i === 0 ? 0 : arr[i - 1]
-    const angleDiff = Math.abs(hue - prevHue)
-    console.log(angleDiff)
-  })
 }

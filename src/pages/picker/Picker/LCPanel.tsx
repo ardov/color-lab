@@ -2,7 +2,7 @@ import type { FC } from 'react'
 
 import { Touchpad, clamp } from './Touchpad'
 import { Pointer } from './Pointer'
-import { Gamut, getMaxChroma } from './shared'
+import { Gamut, MAX_GAMUT_CHROMA } from './shared'
 import { Canvas } from './Canvas'
 
 export const LCPanel: FC<{
@@ -27,7 +27,7 @@ export const LCPanel: FC<{
     children,
     onChange,
   } = props
-  const maxChroma = getMaxChroma(gamut)
+  const maxChroma = MAX_GAMUT_CHROMA[gamut]
 
   return (
     <Touchpad

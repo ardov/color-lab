@@ -30,11 +30,13 @@ export default function List() {
         <a href="https://github.com/ardov/color-lab">Messy source code</a>
       </p>
       <ul>
-        {paths.map(({ path, name, description }) => (
-          <li key={path}>
-            <Link to={path}>{name}</Link> <span>{description}</span>
-          </li>
-        ))}
+        {paths
+          .filter(path => !path.hidden)
+          .map(({ path, name, description }) => (
+            <li key={path}>
+              <Link to={path}>{name}</Link> <span>{description}</span>
+            </li>
+          ))}
       </ul>
     </div>
   )
