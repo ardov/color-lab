@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vitest",
     "start": "vite",
+    "tsc": "tsc --watch",
     "host": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview"
@@ -13,46 +14,49 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
   "dependencies": {
     "@radix-ui/react-slider": "^1.1.2",
-    "@radix-ui/react-tooltip": "^1.0.6",
-    "@react-three/drei": "^9.84.2",
-    "@react-three/fiber": "^8.14.2",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tooltip": "^1.0.7",
+    "@react-three/drei": "^9.94.1",
+    "@react-three/fiber": "^8.15.14",
     "@react-three/xr": "^5.7.1",
     "apca-w3": "^0.1.9",
-    "clsx": "^2.0.0",
-    "culori": "^3.2.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "culori": "^3.3.0",
     "leva": "^0.9.35",
+    "lucide-react": "^0.312.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.16.0",
-    "three": "^0.156.1"
+    "react-router-dom": "^6.21.2",
+    "tailwind-merge": "^2.2.0",
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.160.0"
   },
   "devDependencies": {
-    "@types/culori": "^2.0.1",
-    "@types/react": "^18.2.22",
-    "@types/react-dom": "^18.2.7",
-    "@types/three": "^0.156.0",
-    "@vitejs/plugin-basic-ssl": "^1.0.1",
-    "@vitejs/plugin-react": "^4.0.4",
-    "autoprefixer": "^10.4.16",
-    "eslint": "^8.50.0",
+    "@types/culori": "^2.0.4",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@types/three": "^0.160.0",
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
     "eslint-config-react-app": "^7.0.1",
-    "postcss": "^8.4.30",
-    "sass": "^1.68.0",
-    "stylelint": "^15.10.3",
+    "postcss": "^8.4.33",
+    "prettier": "^3.2.4",
+    "prettier-plugin-tailwindcss": "^0.5.11",
+    "sass": "^1.69.7",
+    "stylelint": "^16.1.0",
     "stylelint-config-prettier": "^9.0.5",
-    "stylelint-config-recommended": "^13.0.0",
-    "stylelint-config-standard-scss": "^11.0.0",
+    "stylelint-config-recommended": "^14.0.0",
+    "stylelint-config-standard-scss": "^13.0.0",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
     "typescript-plugin-css-modules": "^5.0.1",
-    "vite": "^4.4.9",
-    "vite-tsconfig-paths": "^4.2.1",
-    "vitest": "^0.34.5"
+    "vite": "^5.0.11",
+    "vite-tsconfig-paths": "^4.3.1",
+    "vitest": "^1.2.1"
   }
 }
