@@ -1,4 +1,5 @@
-import { Oklch, oklch, rgb } from 'culori'
+import { oklch } from 'culori'
+import { getMaxChroma as fnOkhsl } from './algoOkhsl'
 
 type LCH = [number, number, number]
 type Converter = (r: number, g: number, b: number) => LCH
@@ -107,7 +108,7 @@ function filterInterpolatableCusps(cusps: LCH[], treshold = 0.0001) {
  */
 export function precalculateCusps(
   rgb2oklch: Converter = srgbToOklch,
-  steps = 256
+  steps = 300
 ) {
   const valueList = makeValueList(steps)
 
@@ -138,8 +139,8 @@ export function precalculateCusps(
   // - [optional] remove cusps that are too close to each other and can be interpolated
   // - split the cusps into 360 sections for faster lookup
   const filtered = filterInterpolatableCusps(completeCuspList)
-  console.log('completeCuspList', completeCuspList.length)
-  console.log('filtered', filtered.length)
+  // console.log('completeCuspList', completeCuspList.length)
+  // console.log('filtered', filtered.length)
 
   return filtered
 }
@@ -172,7 +173,7 @@ function getClosestCuspIdx(hue: number, cuspColors: LCH[]) {
   return mid
 }
 
-export function getCuspByHue(hue: number, cuspColors: LCH[]) {
+export function getCuspByHue(hue: number, cuspColors: LCH[]): LCH {
   const idx = getClosestCuspIdx(hue, cuspColors)
   const closest = cuspColors[idx]
   if (closest[2] === hue) {
@@ -190,69 +191,72 @@ export function getCuspByHue(hue: number, cuspColors: LCH[]) {
   return interpolateByHue(hue, start, end)
 }
 
-export function getMaxChroma(h: number, l: number, cusps: LCH[]) {
-  if (l >= 1) return 0
-  if (l <= 0) return 0
+function getMaxChroma(h: number, l: number, cusps: LCH[]) {
+  if (l <= 0 || l >= 1) return 0
   const [cuspL, cuspC] = getCuspByHue(h, cusps)
   if (l <= cuspL) {
     return (l / cuspL) * cuspC
   }
   // l > cuspL
-  // TODO: this is rough approximation, should be improved
+  // TODO: this is a very rough approximation, should be improved
   return ((1 - l) / (1 - cuspL)) * cuspC
 }
 
-// —————————————————————————————————————————————————————————————————————————————
-// —————————————————————————————————————————————————————————————————————————————
-// Checking error rate
+let rgbCusps: LCH[] = []
+let p3Cusps: LCH[] = []
 
-const checkErrorRate = () => {
-  const colorsCount = 10_000
-  const alertTreshold = 0.0002
-  const colors = makeValueList(colorsCount).map(val =>
-    rgb({ mode: 'hsl', h: val * 360, s: 1, l: 0.5 })
-  )
-  const start = performance.now()
-  const cusps = precalculateCusps()
-  const end = performance.now()
-  console.log('precalculateCusps took', +(end - start).toFixed(4), 'ms')
+rgbCusps = precalculateCusps(srgbToOklch)
 
-  const errors = [] as number[]
-
-  colors.forEach(origRgb => {
-    const origOk = oklch(origRgb)
-    const [l, c, h] = getCuspByHue(origOk.h || 0, cusps)
-    if (h >= 264.03 && h <= 264.209) return
-    const calculatedOk: Oklch = { mode: 'oklch', l, c, h }
-    const calculatedRgb = rgb(calculatedOk)
-    const rError = Math.abs(origRgb.r - calculatedRgb.r)
-    const gError = Math.abs(origRgb.g - calculatedRgb.g)
-    const bError = Math.abs(origRgb.b - calculatedRgb.b)
-
-    errors.push(rError, gError, bError)
-
-    if (
-      rError > alertTreshold ||
-      gError > alertTreshold ||
-      bError > alertTreshold
-    ) {
-      console.log('Too big error for hue: ', +h.toFixed(3), {
-        origRgb,
-        origOk,
-        calculatedOk,
-        calculatedRgb,
-
-        rError,
-        gError,
-        bError,
-      })
+export function getMaxChroma2(
+  l: number,
+  h: number,
+  gamut: 'srgb' | 'display-p3' = 'srgb'
+) {
+  if (l <= 0 || l >= 1) return 0
+  if (gamut === 'srgb') {
+    if (!rgbCusps.length) {
+      rgbCusps = precalculateCusps(srgbToOklch)
     }
-  })
-
-  const avgError = errors.reduce((acc, val) => acc + val, 0) / errors.length
-  console.log('Total cusps', cusps.length)
-  console.log('Avg error', +avgError.toFixed(6))
-  console.log('Max error', +Math.max(...errors).toFixed(6))
+    return getMaxChroma(h, l, rgbCusps)
+  }
+  if (gamut === 'display-p3') {
+    if (!p3Cusps.length) {
+      p3Cusps = precalculateCusps(p3ToOklch)
+    }
+    return getMaxChroma(h, l, p3Cusps)
+  }
+  //
+  return 0
 }
 
-checkErrorRate()
+function getMaxChromaHybrid(l: number, h: number, cusps: LCH[]) {
+  if (l <= 0 || l >= 1) return 0
+  const [cuspL, cuspC] = getCuspByHue(h, cusps)
+  if (l <= cuspL) {
+    return (l / cuspL) * cuspC
+  }
+  // l > cuspL
+  // TODO: this is a very rough approximation, should be improved
+  return fnOkhsl(l, h)
+}
+
+export function getMaxChromaHybrid2(
+  l: number,
+  h: number,
+  gamut: 'srgb' | 'display-p3' = 'srgb'
+) {
+  if (l <= 0 || l >= 1) return 0
+  if (gamut === 'srgb') {
+    if (!rgbCusps.length) {
+      rgbCusps = precalculateCusps(srgbToOklch)
+    }
+    return getMaxChromaHybrid(l, h, rgbCusps)
+  }
+  if (gamut === 'display-p3') {
+    if (!p3Cusps.length) {
+      p3Cusps = precalculateCusps(p3ToOklch)
+    }
+    return getMaxChromaHybrid(l, h, p3Cusps)
+  }
+  return 0
+}
