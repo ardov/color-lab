@@ -19,8 +19,10 @@ export function analyzeFunction(
 ) {
   // Get test data
   const testData = getCachedTestSet(testDataSlices, gamut)
-  // .filter(({ h }) => h < 264.01 || h > 264.208)
-  // .filter(({ h }) => h >= 264.01 && h <= 264.208)
+    // Modifiers
+    .filter(({ h }) => h < 264.01 || h > 264.21)
+  // .filter(({ h }) => h < 108 || h > 111)
+  // .filter(({ h }) => h >= 264.01 && h <= 264.21)
 
   let stats = {
     all: { checks: 0, errors: 0 },

@@ -1,15 +1,19 @@
 import { getMaxChroma as fnBinary } from '@/shared/lib/huelab/oklch/getMaxChroma'
 import { culoriClamp } from './algoCuloriClamp'
 import { getMaxChroma } from './algoOkhsl'
-import {
-  getMaxChroma2 as fnLUT,
-  getMaxChromaHybrid2 as fnLUTHybrid,
-} from './algoLUT'
+import { algoLUT } from './algoLUT'
+import { algoLUTHybrid } from './algoLUTHybrid'
+import { algoExtendedLUT } from './algoExtendedLUT'
+import { algoArcLUT } from './algoArcLUT'
+import { algoCurvLUT } from './curvature/algoCurvLUT'
 
 export const algos = {
   okhsl: getMaxChroma,
   culoriClamp,
-  lut: fnLUT,
-  lutHybrid: fnLUTHybrid,
+  lut: algoLUT,
+  lutHybrid: algoLUTHybrid,
   binary: fnBinary,
+  algoExtendedLUT,
+  algoArcLUT,
+  algoCurvLUT,
 }
