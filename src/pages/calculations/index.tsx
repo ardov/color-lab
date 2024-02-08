@@ -3,13 +3,13 @@ import { algos } from './algorithms'
 import { analyzeFunction } from './tests/qualityCheck'
 import { measurePerformance } from './tests/performanceCheck'
 
-const iterations = 20_000
+const iterations = 30_000
 
 const functions = [
   { name: 'Binary search', fn: algos.binary, color: 'blue' },
   { name: 'Clamp chroma', fn: algos.culoriClamp, color: 'blue' },
   { name: 'LUT', fn: algos.lut, color: 'red' },
-  { name: 'LUT hybrid', fn: algos.lutHybrid, color: 'pink' },
+  { name: 'LUT Curvature', fn: algos.algoCurvLUT, color: 'red' },
   { name: 'OKHSL', fn: algos.okhsl, color: 'lime' },
 ]
 
@@ -17,7 +17,7 @@ const data = functions.map(({ name, fn }) => {
   return {
     name,
     time: measurePerformance(fn, 'srgb', iterations),
-    ...analyzeFunction(fn, 'srgb', 1 / 1000, 280),
+    ...analyzeFunction(fn, 'srgb', 1 / 256, 256),
   }
 })
 
@@ -141,7 +141,7 @@ function Chart(props: {
 }) {
   const { hue, funcs } = props
   const width = 800
-  const height = 300
+  const height = 500
   const points = (fn: typeof algos.lut) => {
     const values = new Array(width)
       .fill(0)
