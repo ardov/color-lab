@@ -3,7 +3,7 @@ import { LutPoint, getLutPoint, getMaxC, makeCurvLut } from './curvLut'
 export const SLICES = 256
 
 const lutGetter = makeLutGetter()
-// lutGetter('srgb')
+lutGetter('srgb')
 
 export function algoCurvLUT(
   l: number,
@@ -11,9 +11,9 @@ export function algoCurvLUT(
   gamut: 'srgb' | 'display-p3' = 'srgb'
 ) {
   if (l <= 0 || l >= 1) return 0
-  const luts = lutGetter(gamut)
-  const cusp = getLutPoint(h, luts)
-  return getMaxC(l, cusp)
+  const lut = lutGetter(gamut)
+  const point = getLutPoint(h, lut)
+  return getMaxC(l, point)
 }
 
 function makeLutGetter() {

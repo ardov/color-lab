@@ -1,3 +1,4 @@
+import { lerp } from '@/shared/lib/math'
 import { oklch, rgb } from 'culori'
 import { LCH } from './types'
 
@@ -82,11 +83,6 @@ function removeGlitches(section: LCH[]) {
   const maxHue = section[section.length - 1].h
   // Filter out hues that are outside of the section
   return section.filter(color => color.h >= minHue && color.h <= maxHue)
-}
-
-/** Linear interpolation */
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t
 }
 
 /** Interpolate between two colors by hue */
