@@ -4,20 +4,23 @@ import { analyzeFunction } from './tests/qualityCheck'
 import { measurePerformance } from './tests/performanceCheck'
 
 const iterations = 30_000
+// const GAMUT = 'display-p3'
+const GAMUT = 'srgb'
 
 const functions = [
   { name: 'Binary search', fn: algos.binary, color: 'blue' },
-  { name: 'Clamp chroma', fn: algos.culoriClamp, color: 'blue' },
-  { name: 'LUT', fn: algos.lut, color: 'red' },
-  { name: 'LUT Curvature', fn: algos.algoCurvLUT, color: 'red' },
-  { name: 'OKHSL', fn: algos.okhsl, color: 'lime' },
+  // { name: 'Clamp chroma', fn: algos.culoriClamp, color: 'blue' },
+  // { name: 'LUT', fn: algos.lut, color: 'red' },
+  { name: 'LUT Curvature', fn: algos.algoCurvLUT, color: 'green' },
+  { name: 'LUT Curvature2', fn: algos.wrappedAlgorithm, color: 'red' },
+  // { name: 'OKHSL', fn: algos.okhsl, color: 'lime' },
 ]
 
 const data = functions.map(({ name, fn }) => {
   return {
     name,
-    time: measurePerformance(fn, 'srgb', iterations),
-    ...analyzeFunction(fn, 'srgb', 1 / 256, 256),
+    time: measurePerformance(fn, GAMUT, iterations),
+    ...analyzeFunction(fn, GAMUT, 1 / 256, 256),
   }
 })
 
@@ -145,7 +148,7 @@ function Chart(props: {
   const points = (fn: typeof algos.lut) => {
     const values = new Array(width)
       .fill(0)
-      .map((_, i) => fn(i / (width - 1), hue, 'srgb'))
+      .map((_, i) => fn(i / (width - 1), hue, GAMUT))
     return values.map((c, i) => `${width - i},${height - (c * height) / 0.4}`)
   }
 
