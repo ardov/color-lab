@@ -72,3 +72,12 @@ export function getLutItem(h: number, lut: LutItem[]): LutItem {
   const [min, max] = findClosest(h, lut)
   return lerpLutItemsByHue(min, max, h)
 }
+
+/** Checks if hues go clockwise */
+export function isCW(h1: number, h2: number): boolean {
+  h1 = h1 % 360
+  h2 = h2 % 360
+  let diff = h2 - h1
+  if (diff < 0) diff += 360
+  return diff >= 0 && diff <= 180
+}

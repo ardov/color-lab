@@ -15,7 +15,7 @@ export function makeGamutMapper(
     if (l <= lutItem.l) return (l / lutItem.l) * lutItem.c
 
     // The top (bright) part is approximated by an arc
-    const x = (1 - l) / (1 - lutItem.l)
+    const x = (1 - l) / (1 - lutItem.l) // Normalize l to 0-1 in arc space
     return lutItem.c * intersectionWithArc(x, lutItem.curvature)
   }
 }
@@ -37,7 +37,7 @@ function intersectionWithArc(x: number, curvature: number): number {
   // Since the bisector's slope is -1, the line is at 45 degrees, so the offsets for h and k are equal
   const offset = distanceToCenter / Math.sqrt(2)
 
-  // Position of the center of the circle
+  // Position of the center of the circle. Sign helps to determine the correct center
   const centerX = (curvature > 0 ? offset : -offset) + midpoint.x
   const centerY = (curvature > 0 ? -offset : offset) + midpoint.y
 

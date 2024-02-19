@@ -20,7 +20,7 @@ function isInGamutUsual(color: Oklch) {
 }
 
 function isInGamutCurv(color: Oklch) {
-  return algos.algoCurvLUT(color.l, color.h || 0, 'srgb') > color.c
+  return algos.wrappedAlgorithm(color.l, color.h || 0, 'srgb') > color.c
 }
 
 const iterations = 1000000

@@ -1,8 +1,20 @@
-import { Color, Oklch, P3, Rgb, formatHex, p3, rgb } from 'culori'
+import {
+  Color,
+  Oklch,
+  P3,
+  Rgb,
+  differenceEuclidean,
+  formatHex,
+  oklch,
+  p3,
+  rgb,
+} from 'culori'
 import { TestData, makeTestSet } from './makeTestData'
 
 type Gamut = 'srgb' | 'display-p3'
 type SearchFunc = (l: number, h: number, gamut?: Gamut) => number
+
+const blueHue = oklch({ mode: 'rgb', r: 0, g: 0, b: 1 }).h as number
 
 /**
  *
@@ -20,6 +32,7 @@ export function analyzeFunction(
   // Get test data
   const testData = getCachedTestSet(testDataSlices, gamut)
     // Modifiers
+    // .filter(({ h, r }) => !(r === 0 && h > blueHue))
     .filter(({ h }) => h < 264.01 || h > 264.21)
   // .filter(({ h }) => h < 108 || h > 111)
   // .filter(({ h }) => h >= 264.01 && h <= 264.21)
@@ -30,7 +43,7 @@ export function analyzeFunction(
     middle: { checks: 0, errors: 0 },
     bottom: { checks: 0, errors: 0 },
   }
-  let maxChromaDiff = 0
+  let maxDeltaEDiff = 0
   let mostFailedColor = { hex: '', diff: 0, hue: 0, calculatedHex: '' }
 
   // Run the tests
@@ -41,7 +54,7 @@ export function analyzeFunction(
     top: stats.top.errors / stats.top.checks,
     middle: stats.middle.errors / stats.middle.checks,
     bottom: stats.bottom.errors / stats.bottom.checks,
-    maxChromaDiff,
+    maxDeltaEDiff,
     mostFailedColor,
   }
 
@@ -51,20 +64,17 @@ export function analyzeFunction(
     const chromaDiff = Math.abs(c - calculatedC)
     const calculatedRgb = toRgb({ mode: 'oklch', l, c: calculatedC, h }, gamut)
     const rgbGroup = getRgbGroup(r, g, b)
-    const isDifferent = isDifferentEnough(
-      { r, g, b },
-      calculatedRgb,
-      prescision
-    )
+    const difference = deltaEOK({ r, g, b, mode }, calculatedRgb)
+
     // All
     stats.all.checks++
-    if (isDifferent) stats.all.errors++
+    if (difference > 0.02) stats.all.errors++
     // Group
     stats[rgbGroup].checks++
-    if (isDifferent) stats[rgbGroup].errors++
+    if (difference > 0.02) stats[rgbGroup].errors++
     // Max diff
-    if (chromaDiff > maxChromaDiff) {
-      maxChromaDiff = chromaDiff
+    if (difference > maxDeltaEDiff) {
+      maxDeltaEDiff = chromaDiff
       mostFailedColor = {
         hex: formatHex({ r, g, b, mode }),
         diff: chromaDiff,
@@ -107,32 +117,15 @@ function getRgbGroup(
 }
 
 /** Checks if the colors are different enough */
-function isDifferentEnough(
-  c0: { r: number; g: number; b: number },
-  c1: { r: number; g: number; b: number },
-  prescision: number
-) {
-  return (
-    Math.abs(c0.r - c1.r) > prescision ||
-    Math.abs(c0.g - c1.g) > prescision ||
-    Math.abs(c0.b - c1.b) > prescision
-  )
+function deltaEOK(c0: Color, c1: Color) {
+  const diffFn = differenceEuclidean('oklab')
+  return diffFn(c0, c1)
 }
 
 function toRgb(color: Color, gamut: Gamut) {
-  return gamut === 'srgb' ? rgb(color) : p3(color)
-}
-
-/** Checks if the conversion is reversible with the given prescision */
-function checkReversibility(
-  rgbColor: Rgb | P3,
-  lchColor: Oklch,
-  prescision: number
-) {
-  const reconverted = rgbColor.mode === 'rgb' ? rgb(lchColor) : p3(lchColor)
-  return (
-    Math.abs(rgbColor.r - reconverted.r) < prescision &&
-    Math.abs(rgbColor.g - reconverted.g) < prescision &&
-    Math.abs(rgbColor.b - reconverted.b) < prescision
-  )
+  let rgbColor = gamut === 'srgb' ? rgb(color) : p3(color)
+  rgbColor.r = Math.max(0, Math.min(1, rgbColor.r))
+  rgbColor.g = Math.max(0, Math.min(1, rgbColor.g))
+  rgbColor.b = Math.max(0, Math.min(1, rgbColor.b))
+  return rgbColor
 }

@@ -1,10 +1,11 @@
 import { type OKLCH, lerp, lerpColorByHue } from '../utils'
+import { fixColorSection } from './fixColorSection'
 
 /**
  * Generates and cleans a list of OKLCH colors that can be used as a lookup table.
  * @param rgbToOklch converter from RGB to OKLCH
- * @param lightness HSL lightness for RGB colors
- * @param steps number of steps in each hue region
+ * @param lightness lightness of HSL transform (0.5 gives the most colorful colors)
+ * @param steps intended number of steps in each hue region
  * @returns
  */
 export function makeColorList(
@@ -30,7 +31,7 @@ export function makeColorList(
         return rgbToOklch(r, g, b)
       })
     })
-    .map(segment => removeGlitches(segment))
+    .map(segment => fixColorSection(segment))
     .map(segment => filterInterpolatableColors(segment))
     .reduce((acc, val) => acc.concat(val.slice(0, -1)), []) // merge
     .sort((a, b) => a.h - b.h) // ascending sort by hue
@@ -56,19 +57,6 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   return [m1, 2 * l - m1, m2]
 }
 
-/** Cleans a segment from OKLCH glitches */
-function removeGlitches(section: OKLCH[]) {
-  const minHue = section[0].h
-  const maxHue = section[section.length - 1].h
-  if (maxHue - minHue < 0) {
-    // special case
-    return section.filter(color => color.h >= maxHue || color.h <= minHue)
-  }
-  // In the blue peak (blue-cyan side) the hue can go backwards.
-  // The simplest solution is to filter out the colors that lay outside of the section
-  return section.filter(color => color.h >= minHue && color.h <= maxHue)
-}
-
 /** Adds the first (hue=0) and the last (hue=360) colors to the list */
 function completeList(list: OKLCH[]): OKLCH[] {
   const endColor = lerpColorByHue(
@@ -84,7 +72,6 @@ function filterInterpolatableColors(colors: OKLCH[], treshold = 0.00001) {
   const quadTreshold = treshold ** 2
   let result = colors
   let changed = true
-  let lvl = 0
 
   while (changed) {
     const filtered = result.filter((color, idx, list) => {
@@ -100,17 +87,8 @@ function filterInterpolatableColors(colors: OKLCH[], treshold = 0.00001) {
       changed = false
     } else {
       result = filtered
-      lvl++
     }
   }
-  console.log(
-    'Compression: ',
-    (100 * (1 - result.length / colors.length)).toFixed(1) + '% ',
-    colors.length,
-    '->',
-    result.length,
-    'iterations:',
-    lvl
-  )
+
   return result
 }
