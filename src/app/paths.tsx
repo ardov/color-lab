@@ -56,11 +56,11 @@ export const paths: {
     component: lazy(() => import('@/pages/picker')),
   },
   {
-    name: 'Math stuff',
-    description: 'console logging mostly',
-    path: '/calculations',
+    name: 'Gamut mapping',
+    description: 'A playground to test differrent gamut mapping algorithms',
+    path: '/gamut-mapping',
     component: lazy(() => import('@/pages/calculations')),
-    hidden: true,
+    // hidden: true,
   },
   // {
   //   name: 'HDR',
