@@ -3,7 +3,7 @@ import { algos } from './algorithms'
 import { analyzeFunction } from './qualityCheck/qualityCheck'
 import { measurePerformance } from './qualityCheck/performanceCheck'
 
-const iterations = 60_000
+const iterations = 30_000
 // const GAMUT = 'display-p3'
 const GAMUT = 'srgb'
 
@@ -20,13 +20,17 @@ const data = functions.map(({ name, fn }) => {
   return {
     name,
     time: measurePerformance(fn, GAMUT, iterations),
-    ...analyzeFunction(fn, GAMUT, 1 / 256, 300),
+    ...analyzeFunction(fn, {
+      gamut: GAMUT,
+      testDataSlices: 256,
+      jnd: 0.02,
+    }),
   }
 })
 type DataPoint = (typeof data)[0]
 
 function Table2() {
-  const prcnt = (v: number) => (v === 0 ? '—' : (v * 100).toFixed(2) + '%')
+  const prcnt = (v: number) => (v === 0 ? '—' : (v * 100).toFixed(3) + '%')
   const rows: [string, (d: DataPoint) => string | JSX.Element][] = [
     ['Algorithm', d => d.name],
     ['Time', d => Math.round(d.time) + ' ms'],

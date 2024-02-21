@@ -1,5 +1,5 @@
 import { oklch } from 'culori'
-import { makeGamutMapper } from './edge-seeker'
+import { makeEdgeSeeker } from './edge-seeker'
 
 const converters = {
   srgb: (r: number, g: number, b: number) => {
@@ -16,8 +16,8 @@ const converters = {
   },
 }
 
-const toSRGB = makeGamutMapper(converters.srgb)
-const toDisplayP3 = makeGamutMapper(converters['display-p3'])
+const toSRGB = makeEdgeSeeker(converters['srgb'])
+const toDisplayP3 = makeEdgeSeeker(converters['display-p3'])
 
 export function wrappedAlgorithm(
   l: number,

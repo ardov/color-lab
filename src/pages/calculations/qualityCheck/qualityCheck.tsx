@@ -1,14 +1,4 @@
-import {
-  Color,
-  Oklch,
-  P3,
-  Rgb,
-  differenceEuclidean,
-  formatHex,
-  oklch,
-  p3,
-  rgb,
-} from 'culori'
+import { Color, differenceEuclidean, formatHex, oklch, p3, rgb } from 'culori'
 import { TestData, makeTestSet } from './makeTestData'
 
 type Gamut = 'srgb' | 'display-p3'
@@ -25,15 +15,19 @@ const blueHue = oklch({ mode: 'rgb', r: 0, g: 0, b: 1 }).h as number
  */
 export function analyzeFunction(
   fn: SearchFunc,
-  gamut: Gamut,
-  prescision: number,
-  testDataSlices: number = 256
+  opts: {
+    gamut: Gamut
+    testDataSlices: number
+    jnd: number
+  }
 ) {
+  const { gamut, testDataSlices, jnd } = opts
+
   // Get test data
   const testData = getCachedTestSet(testDataSlices, gamut)
     // Modifiers
-    // .filter(({ h, r }) => !(r === 0 && h > blueHue))
-    .filter(({ h }) => h < 264.01 || h > 264.21)
+    .filter(({ h, r }) => !(r === 0 && h > blueHue))
+  // .filter(({ h }) => h < 264.01 || h > 264.21)
   // .filter(({ h }) => h < 108 || h > 111)
   // .filter(({ h }) => h >= 264.01 && h <= 264.21)
 
@@ -68,10 +62,10 @@ export function analyzeFunction(
 
     // All
     stats.all.checks++
-    if (difference > 0.02) stats.all.errors++
+    if (difference > jnd) stats.all.errors++
     // Group
     stats[rgbGroup].checks++
-    if (difference > 0.02) stats[rgbGroup].errors++
+    if (difference > jnd) stats[rgbGroup].errors++
     // Max diff
     if (difference > maxDeltaEDiff) {
       maxDeltaEDiff = chromaDiff

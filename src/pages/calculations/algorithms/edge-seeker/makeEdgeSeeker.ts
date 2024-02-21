@@ -3,13 +3,16 @@ import { makeLut } from './lut/makeLut'
 
 const SLICES = 400
 
-export function makeGamutMapper(
+export function makeEdgeSeeker(
   rgbToOklch: (r: number, g: number, b: number) => OKLCH
 ) {
   const lut = makeLut(rgbToOklch, SLICES)
+  let cachedHue = 0
+  let cachedItem = getLutItem(0, lut)
   return function getMaxChroma(l: number, h: number) {
     if (l <= 0 || l >= 1) return 0
-    const lutItem = getLutItem(h, lut)
+
+    const lutItem = h === cachedHue ? cachedItem : getLutItem(h, lut)
 
     // The bottom (dark) part is always a straight line
     if (l <= lutItem.l) return (l / lutItem.l) * lutItem.c

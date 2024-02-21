@@ -1,1 +1,1 @@
-export { makeGamutMapper } from './algorithm'
+export { makeEdgeSeeker } from './makeEdgeSeeker'
