@@ -9,10 +9,15 @@ export function makeEdgeSeeker(
   const lut = makeLut(rgbToOklch, SLICES)
   let cachedHue = 0
   let cachedItem = getLutItem(0, lut)
+  const lutItemGetter = (hue: number) => {
+    if (hue === cachedHue) return cachedItem
+    cachedHue = hue
+    return (cachedItem = getLutItem(hue, lut))
+  }
+
   return function getMaxChroma(l: number, h: number) {
     if (l <= 0 || l >= 1) return 0
-
-    const lutItem = h === cachedHue ? cachedItem : getLutItem(h, lut)
+    const lutItem = lutItemGetter(h)
 
     // The bottom (dark) part is always a straight line
     if (l <= lutItem.l) return (l / lutItem.l) * lutItem.c
