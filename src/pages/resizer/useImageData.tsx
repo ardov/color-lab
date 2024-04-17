@@ -8,16 +8,35 @@ export function useImageData() {
 
   const loadFile = useCallback((file?: File | null) => {
     if (!file) return
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      const img = new Image()
-      img.src = URL.createObjectURL(file)
-      img.onload = () => {
-        canvas.height = img.height
-        canvas.width = img.width
-        ctx.drawImage(img, 0, 0)
-        setImgData(ctx.getImageData(0, 0, img.width, img.height))
+    if (file.type.startsWith('image')) {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        const img = new Image()
+        img.src = URL.createObjectURL(file)
+        img.onload = () => {
+          canvas.height = img.height
+          canvas.width = img.width
+          ctx.drawImage(img, 0, 0)
+          setImgData(ctx.getImageData(0, 0, img.width, img.height))
+        }
+      }
+    }
+    if (file.type.startsWith('video')) {
+      const video = document.createElement('video')
+      video.src = URL.createObjectURL(file)
+      video.onloadeddata = () => {
+        video.onseeked = () => {
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')!
+          canvas.height = video.videoHeight
+          canvas.width = video.videoWidth
+          ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight)
+          setImgData(
+            ctx.getImageData(0, 0, video.videoWidth, video.videoHeight)
+          )
+        }
+        video.currentTime = video.duration / 2
       }
     }
   }, [])

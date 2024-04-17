@@ -168,17 +168,21 @@ function resizeImage(source: ImageData, spec: Spec): ImageData {
 export default function Resizer() {
   const { imgData, loadFile } = useImageData()
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [minAR, setMinAR] = useState<number>(9 / 16)
-  const [maxAR, setMaxAR] = useState<number>(16 / 9)
-  const [minWidth, setMinWidth] = useState<number>(100)
-  const [maxWidth, setMaxWidth] = useState<number>(1080)
-  const [minHeight, setMinHeight] = useState<number>(100)
-  const [maxHeight, setMaxHeight] = useState<number>(1080)
+  const [minAR, setMinAR] = useState(9 / 16)
+  const [maxAR, setMaxAR] = useState(16 / 9)
+  const [minWidth, setMinWidth] = useState(100)
+  const [maxWidth, setMaxWidth] = useState(1080)
+  const [minHeight, setMinHeight] = useState(100)
+  const [maxHeight, setMaxHeight] = useState(1080)
+  const [fps, setFps] = useState(0)
 
   useEffect(() => {
     if (!imgData) return
     const spec = { minAR, maxAR, minWidth, maxWidth, minHeight, maxHeight }
+    const t0 = performance.now()
     const adjusted = resizeImage(imgData, spec)
+    const t1 = performance.now()
+    setFps(1000 / (t1 - t0))
     const canvas = canvasRef.current!
     canvas.width = adjusted.width
     canvas.height = adjusted.height
@@ -195,6 +199,7 @@ export default function Resizer() {
             autoFocus
             style={{ position: 'absolute', visibility: 'hidden' }}
             type="file"
+            accept="image/*,video/*"
             // accept="image/*"
             onChange={e => loadFile(e.target.files![0])}
           />
@@ -289,6 +294,7 @@ export default function Resizer() {
             }}
           />
         </label>
+        <label style={{ color: 'black' }}>FPS: {fps.toFixed(2)}</label>
       </Stack>
 
       <div>
