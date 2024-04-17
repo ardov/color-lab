@@ -62,6 +62,13 @@ export const paths: {
     component: lazy(() => import('@/pages/calculations')),
     // hidden: true,
   },
+  {
+    name: 'Resizer',
+    description: 'A playground to test differrent gamut mapping algorithms',
+    path: '/resizer',
+    component: lazy(() => import('@/pages/resizer')),
+    hidden: true,
+  },
   // {
   //   name: 'HDR',
   //   description: 'Experiments with HDR color spaces',

@@ -1,0 +1,20 @@
+.area {
+  --bg: hsl(0, 0%, 60%);
+  // resize: both;
+  // overflow: hidden;
+  border-radius: 8px;
+  background-color: var(--bg);
+  margin: 20px;
+  position: relative;
+}
+
+.sliders {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
