@@ -12,6 +12,8 @@ type Spec = {
   maxHeight: number
 }
 
+const round = Math.round
+
 function calcSizes(width: number, height: number, spec: Spec) {
   const sourceAR = width / height
   const { minAR, maxAR, minWidth, maxWidth, minHeight, maxHeight } = spec
@@ -22,21 +24,21 @@ function calcSizes(width: number, height: number, spec: Spec) {
     if (width < minWidth) scale = minWidth / width
     if (width > maxWidth) scale = maxWidth / width
 
-    const scaledHeight = height * scale
+    const scaledHeight = round(height * scale)
     if (scaledHeight < minHeight) scale = minHeight / height
     if (scaledHeight > maxHeight) scale = maxHeight / height
 
     // Double check the width is within bounds
-    const scaledWidth = width * scale
+    const scaledWidth = round(width * scale)
     if (scaledWidth < minWidth || scaledWidth > maxWidth) {
       throw new Error('Invalid width')
     }
 
     return {
-      frameWidth: width * scale,
-      frameHeight: height * scale,
-      imgWidth: width * scale,
-      imgHeight: height * scale,
+      frameWidth: round(width * scale),
+      frameHeight: round(height * scale),
+      imgWidth: round(width * scale),
+      imgHeight: round(height * scale),
       offsetX: 0,
       offsetY: 0,
     }
@@ -48,14 +50,14 @@ function calcSizes(width: number, height: number, spec: Spec) {
     if (height < minHeight) frameHeight = minHeight
     if (height > maxHeight) frameHeight = maxHeight
 
-    let frameWidth = frameHeight * minAR
+    let frameWidth = round(frameHeight * minAR)
     if (frameWidth < minWidth) {
       frameWidth = minWidth
-      frameHeight = frameWidth / minAR
+      frameHeight = round(frameWidth / minAR)
     }
     if (frameWidth > maxWidth) {
       frameWidth = maxWidth
-      frameHeight = frameWidth / minAR
+      frameHeight = round(frameWidth / minAR)
     }
 
     // Double check the height is within bounds
@@ -64,15 +66,15 @@ function calcSizes(width: number, height: number, spec: Spec) {
     }
 
     const scale = frameHeight / height
-    const scaledWidth = width * scale
-    const offsetX = (frameWidth - scaledWidth) / 2
+    const scaledWidth = round(width * scale)
+    const offsetX = round((frameWidth - scaledWidth) / 2)
     const offsetY = 0
 
     return {
       frameWidth: frameWidth,
       frameHeight: frameHeight,
-      imgWidth: width * scale,
-      imgHeight: height * scale,
+      imgWidth: round(width * scale),
+      imgHeight: round(height * scale),
       offsetX,
       offsetY,
     }
@@ -84,14 +86,14 @@ function calcSizes(width: number, height: number, spec: Spec) {
     if (width < minWidth) frameWidth = minWidth
     if (width > maxWidth) frameWidth = maxWidth
 
-    let frameHeight = frameWidth / maxAR
+    let frameHeight = round(frameWidth / maxAR)
     if (frameHeight < minHeight) {
       frameHeight = minHeight
-      frameWidth = frameHeight * maxAR
+      frameWidth = round(frameHeight * maxAR)
     }
     if (frameHeight > maxHeight) {
       frameHeight = maxHeight
-      frameWidth = frameHeight * maxAR
+      frameWidth = round(frameHeight * maxAR)
     }
 
     // Double check the width is within bounds
@@ -100,15 +102,15 @@ function calcSizes(width: number, height: number, spec: Spec) {
     }
 
     const scale = frameWidth / width
-    const scaledHeight = height * scale
+    const scaledHeight = round(height * scale)
     const offsetX = 0
-    const offsetY = (frameHeight - scaledHeight) / 2
+    const offsetY = round((frameHeight - scaledHeight) / 2)
 
     return {
       frameWidth: frameWidth,
       frameHeight: frameHeight,
-      imgWidth: width * scale,
-      imgHeight: height * scale,
+      imgWidth: round(width * scale),
+      imgHeight: round(height * scale),
       offsetX,
       offsetY,
     }
@@ -121,6 +123,9 @@ function calcSizes2(width: number, height: number, spec: Spec) {
   try {
     return calcSizes(width, height, spec)
   } catch (e) {
+    // console.error('Failed to resize image', width, height, spec)
+    // debugger
+    // calcSizes(width, height, spec)
     return {
       frameWidth: width,
       frameHeight: height,
@@ -135,8 +140,9 @@ function calcSizes2(width: number, height: number, spec: Spec) {
 // Resizes the image to fit the given spec. If the image is too small stretches it to minimal size.  Adds black borders if necessary.
 function resizeImage(source: ImageData, spec: Spec): ImageData {
   const { width, height } = source
+  const calculatedSizes = calcSizes2(width, height, spec)
   const { frameWidth, frameHeight, imgWidth, imgHeight, offsetX, offsetY } =
-    calcSizes2(width, height, spec)
+    calculatedSizes
 
   const tempCanvas = document.createElement('canvas')
   tempCanvas.width = source.width
@@ -170,10 +176,10 @@ export default function Resizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [minAR, setMinAR] = useState(9 / 16)
   const [maxAR, setMaxAR] = useState(16 / 9)
-  const [minWidth, setMinWidth] = useState(100)
-  const [maxWidth, setMaxWidth] = useState(1080)
-  const [minHeight, setMinHeight] = useState(100)
-  const [maxHeight, setMaxHeight] = useState(1080)
+  const [minWidth, setMinWidth] = useState(10)
+  const [maxWidth, setMaxWidth] = useState(250)
+  const [minHeight, setMinHeight] = useState(10)
+  const [maxHeight, setMaxHeight] = useState(4000)
   const [fps, setFps] = useState(0)
 
   useEffect(() => {
@@ -238,8 +244,8 @@ export default function Resizer() {
           Min width
           <input
             type="range"
-            min={100}
-            max={1080}
+            min={10}
+            max={4000}
             step={10}
             value={minWidth}
             onChange={e => {
@@ -253,8 +259,8 @@ export default function Resizer() {
           Max width
           <input
             type="range"
-            min={100}
-            max={1080}
+            min={10}
+            max={4000}
             step={10}
             value={maxWidth}
             onChange={e => {
