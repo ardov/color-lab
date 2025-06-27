@@ -56,6 +56,12 @@ export const paths: {
     component: lazy(() => import('@/pages/picker')),
   },
   {
+    name: 'Favicon Finder',
+    description: 'Find and download favicons from any website',
+    path: '/favicons',
+    component: lazy(() => import('@/pages/favicons')),
+  },
+  {
     name: 'Gamut mapping',
     description: 'A playground to test differrent gamut mapping algorithms',
     path: '/gamut-mapping',
