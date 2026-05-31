@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { paths } from './paths'
 
