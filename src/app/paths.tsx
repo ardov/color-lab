@@ -70,9 +70,16 @@ export const paths: {
   },
   {
     name: 'Resizer',
-    description: 'A playground to test differrent gamut mapping algorithms',
+    description: 'A preview of resizing the image',
     path: '/resizer',
     component: lazy(() => import('@/pages/resizer')),
+    hidden: true,
+  },
+  {
+    name: 'Spectral Colors',
+    description: 'A playground to play with spectral colors',
+    path: '/spd',
+    component: lazy(() => import('@/pages/spd')),
     hidden: true,
   },
   // {

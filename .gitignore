@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .yarn
+.pnpm-store
 
 # Editor directories and files
 .vscode/*
