@@ -57,7 +57,7 @@ function isEqualHex(a: any, b: any) {
   return a.toLowerCase().replace('#', '') === b.toLowerCase().replace('#', '')
 }
 function toOklrch(hex: string): Oklrch {
-  return oklrch(parseHex(hex))
+  return oklrch(parseHex(hex)!)
 }
 function toHex(oklrch: Oklrch): string {
   return formatHex(clampChroma(oklrchToOklch(oklrch), 'srgb'))

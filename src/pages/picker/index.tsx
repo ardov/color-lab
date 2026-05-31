@@ -80,7 +80,7 @@ const roundColor = (color: Oklch) => {
   let channel = 'l' as 'l' | 'c' | 'h'
   let digits = 3
   // let copy = { ...color } as Oklch
-  let copy = oklch(parseHex(hex))
+  let copy = oklch(parseHex(hex)!)!
   copy.l = +color.l.toFixed(digits)
   copy.c = +color.c.toFixed(digits)
   copy.h = +(color.h || 0).toFixed(digits)
