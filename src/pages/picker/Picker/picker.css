@@ -42,7 +42,7 @@
   height: var(--size);
   transform: translate(-50%, -50%);
   background-color: var(--color);
-  // border: 2px solid #fff;
+  /* border: 2px solid #fff; */
   border-radius: 50%;
   box-shadow: 0 0 0 2px var(--ring);
   transition: outline 0.2s ease-in-out;
@@ -51,7 +51,7 @@
 .pckr__interactive:focus .pckr__pointer {
   outline: 3px solid var(--outline);
   outline-offset: 2px;
-  // transform: translate(-50%, -50%) scale(1.1);
+  /* transform: translate(-50%, -50%) scale(1.1); */
 }
 
 .pckr__canvas {
@@ -71,7 +71,7 @@
   flex-direction: row;
   gap: 1px;
 
-  &>* {
+  & > * {
     flex-grow: 1;
     width: 100%;
     flex-shrink: 1;
@@ -111,7 +111,7 @@
     color: rgb(255 255 255);
     background-color: rgb(255 255 255 /0.16);
 
-    // Remove arrows from number input
+    /* Remove arrows from number input */
     -moz-appearance: textfield;
     appearance: textfield;
   }

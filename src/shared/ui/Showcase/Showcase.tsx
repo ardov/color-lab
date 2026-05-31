@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef } from 'react'
 import { clsx } from 'clsx'
-import classes from './Showcase.module.scss'
+import classes from './Showcase.module.css'
 import { TTheme } from '@/shared/lib/theme'
 import { Button } from '@/shared/ui/Button'
 import { Notice } from '@/shared/ui/Notice'

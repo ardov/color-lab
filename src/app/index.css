@@ -30,8 +30,8 @@ body {
 *:focus {
   outline: 3px solid var(--c-acc-text-secondary);
   outline-offset: 2px;
-  // outline: 3px solid var(--c-acc-surface-active);
-  // outline-offset: 1px;
+  /* outline: 3px solid var(--c-acc-surface-active); */
+  /* outline-offset: 1px; */
 }
 
 a {

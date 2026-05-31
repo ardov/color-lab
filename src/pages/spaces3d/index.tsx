@@ -7,7 +7,7 @@ import {
   PerspectiveCamera,
 } from '@react-three/drei'
 import { useControls } from 'leva'
-import './styles.scss'
+import './styles.css'
 import { spaces } from './spaces'
 import { Boundary } from './Boundary'
 import { Slider } from '@/shared/ui/Slider'

@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { clsx } from 'clsx'
-import classes from './Slider.module.scss'
+import classes from './Slider.module.css'
 import * as RadixSlider from '@radix-ui/react-slider'
 
 export type SliderProps = RadixSlider.SliderProps

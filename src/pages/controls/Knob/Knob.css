@@ -1,0 +1,58 @@
+.knob {
+  --thumb-size: 20px;
+  --thumb-scale: 0.8;
+  --thumb: hsl(0, 0%, 100%);
+  --track: hsl(0 0% 0% / 0.1);
+}
+
+.knob:hover,
+.knob:focus-within {
+  --thumb-scale: 1;
+}
+
+.knob__root {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+  touch-action: none;
+  width: 100%;
+  height: 100%;
+}
+
+.knob__track {
+  background-color: var(--track);
+  flex-grow: 1;
+  width: 1px;
+}
+
+.knob__thumb {
+  position: relative;
+  width: 0px;
+  height: 0px;
+
+  --radius: 50%;
+  --transform: rotate(-45deg) scale(calc(var(--thumb-scale) * 0.8));
+}
+
+.knob__thumb--locked {
+  --radius: 2px;
+  --transform: rotate(45deg) scale(var(--thumb-scale));
+}
+
+.knob__thumb::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--thumb-size) / -2);
+  left: calc(var(--thumb-size) / -2);
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: var(--radius);
+  transform: var(--transform);
+  background-color: var(--thumb);
+
+  box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.1);
+  transition: all 0.15s ease-in-out;
+}

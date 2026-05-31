@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react'
 import { clsx } from 'clsx'
-import classes from './Notice.module.scss'
+import classes from './Notice.module.css'
 
 export type NoticeProps = {
   title?: ReactNode

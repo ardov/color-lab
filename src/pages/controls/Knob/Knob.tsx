@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import * as Slider from '@radix-ui/react-slider'
-import './Knob.scss'
+import './Knob.css'
 
 type KnobProps = {
   value: number

@@ -1,7 +1,7 @@
 .area {
   --bg: hsl(0, 0%, 60%);
-  // resize: both;
-  // overflow: hidden;
+  /* resize: both; */
+  /* overflow: hidden; */
   border-radius: 8px;
   background-color: var(--bg);
   margin: 20px;

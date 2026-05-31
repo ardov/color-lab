@@ -1,7 +1,7 @@
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 import { Stack } from '@/shared/ui/Stack'
 import magic from './magic.jpg'
-import './styles.scss'
+import './styles.css'
 
 const theme = makeTheme({})
 

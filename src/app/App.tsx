@@ -2,8 +2,8 @@ import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { applyTheme, makeTheme } from '@/shared/lib/theme'
 
-import './reset.scss'
-import './index.scss'
+import './reset.css'
+import './index.css'
 import { paths } from './paths'
 import List from './List'
 

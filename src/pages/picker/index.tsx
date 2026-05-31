@@ -2,7 +2,7 @@ import { betterToeInv, clampChroma } from '@/shared/lib/huelab'
 import { formatHex, Oklch, oklch, parseHex } from 'culori'
 import { useState } from 'react'
 
-import './styles.scss'
+import './styles.css'
 import { Gamut } from './Picker/shared'
 import { HexPicker } from './Picker'
 import { Oklrch } from './Picker/oklrch'

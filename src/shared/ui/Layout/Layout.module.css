@@ -22,5 +22,5 @@
 
 .mainPanel {
   flex-grow: 1;
-  // background-color: var(--c-main-surface-normal);
+  /* background-color: var(--c-main-surface-normal); */
 }

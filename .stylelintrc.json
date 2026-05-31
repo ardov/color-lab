@@ -2,7 +2,6 @@
   "defaultSeverity": "warning",
   "extends": [
     "stylelint-config-recommended",
-    "stylelint-config-standard-scss",
     "stylelint-config-prettier"
   ]
 }

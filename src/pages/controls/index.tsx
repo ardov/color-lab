@@ -1,4 +1,4 @@
-import './styles.scss'
+import './styles.css'
 import { FC, useMemo, useState } from 'react'
 import { interpolateValues } from './shared/interpolateValues'
 import { Knob } from './Knob'

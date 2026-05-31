@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { buttonGroup, useControls } from 'leva'
-import './styles.scss'
+import './styles.css'
 import { Matrix } from '@/shared/lib/vectorMath/classes'
 import { useDragRotation2 } from './shared/useDragRotation'
 import { makeRgbCube, polygon2matrix } from './Polygon'

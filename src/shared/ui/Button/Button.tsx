@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { clsx } from 'clsx'
-import classes from './Button.module.scss'
+import classes from './Button.module.css'
 
 export type ButtonProps = React.HTMLAttributes<HTMLOrSVGElement> & {
   size?: 'l' | 'm'

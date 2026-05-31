@@ -3,9 +3,9 @@
 
   background-color: var(--c-acc-surface-normal);
   border: 1px solid var(--c-acc-divider);
-  // color: var(--c-acc-text-primary);
+  /* color: var(--c-acc-text-primary); */
 
-  // Size
+  /* Size */
   padding: 16px;
   min-height: 32px;
   display: flex;

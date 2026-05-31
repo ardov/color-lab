@@ -5,7 +5,7 @@
   border: 1px solid var(--c-acc-divider);
   color: var(--c-acc-text-primary);
 
-  // Size
+  /* Size */
   padding: 24px;
   min-height: 32px;
   display: flex;

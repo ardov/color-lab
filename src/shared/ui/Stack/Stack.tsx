@@ -1,6 +1,6 @@
 import { forwardRef, ReactNode } from 'react'
 import { clsx } from 'clsx'
-import classes from './Stack.module.scss'
+import classes from './Stack.module.css'
 
 export type StackProps = React.HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode

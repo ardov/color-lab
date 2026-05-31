@@ -1,7 +1,7 @@
 .root {
   --bg: var(--c-acc-btn-normal);
 
-  // Size
+  /* Size */
   padding: 2px 16px;
   min-height: 32px;
 
@@ -82,7 +82,7 @@
 
   &::before {
     opacity: 0;
-    // border: 1px solid var(--bg);
+    /* border: 1px solid var(--bg); */
     background-color: var(--c-acc-surface-hover);
     transform: scale(0.8);
   }

@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react'
 import { clsx } from 'clsx'
-import classes from './Layout.module.scss'
+import classes from './Layout.module.css'
 
 export type LayoutProps = {
   leftPanel: ReactNode

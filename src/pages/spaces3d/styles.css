@@ -35,8 +35,8 @@ body {
 }
 
 .current {
-  // font-weight: 900;
-  // color: black;
+  /* font-weight: 900; */
+  /* color: black; */
   background-color: white;
 }
 
@@ -51,7 +51,7 @@ body {
 }
 
 .slider {
-  // width: 100%;
+  /* width: 100%; */
   max-width: 320px;
 }
 

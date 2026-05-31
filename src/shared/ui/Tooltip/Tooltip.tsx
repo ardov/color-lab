@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react'
 import * as RadTooltip from '@radix-ui/react-tooltip'
 import { clsx } from 'clsx'
-import classes from './Tooltip.module.scss'
+import classes from './Tooltip.module.css'
 
 export type TooltipProps = {
   children: ReactNode
