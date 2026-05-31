@@ -69,7 +69,7 @@ const FuncPreview: FC<{
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [time, setTime] = useState(0)
   const [timeHalf, setTimeHalf] = useState(0)
-  const cbRef = useRef<number>()
+  const cbRef = useRef<number>(undefined)
 
   useEffect(() => {
     if (cbRef.current) cancelIdleCallback(cbRef.current)

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { algos } from './algorithms'
 import { analyzeFunction } from './qualityCheck/qualityCheck'
 import { measurePerformance } from './qualityCheck/performanceCheck'
@@ -31,7 +31,7 @@ type DataPoint = (typeof data)[0]
 
 function Table2() {
   const prcnt = (v: number) => (v === 0 ? '—' : (v * 100).toFixed(3) + '%')
-  const rows: [string, (d: DataPoint) => string | JSX.Element][] = [
+  const rows: [string, (d: DataPoint) => string | React.JSX.Element][] = [
     ['Algorithm', d => d.name],
     ['Time', d => Math.round(d.time) + ' ms'],
     ['Err (all)', d => prcnt(d.all)],

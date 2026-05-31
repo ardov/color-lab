@@ -15,8 +15,10 @@ import { Button } from '@/shared/ui/Button'
 import { makePlaneGeometry } from './gamuts'
 import { Gradient } from './gradient'
 import { Mode, Rgb } from 'culori'
-import { ARButton, XR, useXR } from '@react-three/xr'
+import { createXRStore, XR, useXR } from '@react-three/xr'
 import { GamutPlane } from './XRayPlane'
+
+const xrStore = createXRStore()
 
 export default function Spaces3d() {
   const morphState = useMorphState()
@@ -154,7 +156,7 @@ export default function Spaces3d() {
         )}
       </div>
 
-      <ARButton />
+      <button onClick={() => xrStore.enterAR()}>Enter AR</button>
 
       <main className="canvas">
         <Canvas
@@ -166,7 +168,7 @@ export default function Spaces3d() {
             zoom: 350,
           }}
         >
-          <XR referenceSpace="local">
+          <XR store={xrStore}>
             {/* <Box
             args={[0.1, 0.1, 0.1]}
             material={new THREE.MeshNormalMaterial()}
@@ -326,7 +328,7 @@ function cosine(t: number) {
 }
 
 function SceneWrapper({ children }: { children: ReactNode }) {
-  const isInAR = useXR(state => state.isPresenting)
+  const isInAR = useXR(state => state.session != null)
   return (
     <>
       {!isInAR && (

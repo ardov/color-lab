@@ -1,11 +1,11 @@
-import { FC } from 'react'
+import React, { FC } from 'react'
 import { clsx } from 'clsx'
 import classes from './Button.module.css'
 
 export type ButtonProps = React.HTMLAttributes<HTMLOrSVGElement> & {
   size?: 'l' | 'm'
   use?: 'primary' | 'secondary' | 'tetriary'
-  tag?: keyof JSX.IntrinsicElements
+  tag?: keyof React.JSX.IntrinsicElements
 }
 
 export const Button: FC<ButtonProps> = props => {
@@ -17,9 +17,9 @@ export const Button: FC<ButtonProps> = props => {
     use = 'primary',
     ...delegated
   } = props
+  const Tag = Wrapper as any
   return (
-    // @ts-expect-error Some problem with three.js types
-    <Wrapper
+    <Tag
       className={clsx(
         classes.root,
         {
@@ -32,6 +32,6 @@ export const Button: FC<ButtonProps> = props => {
       {...delegated}
     >
       {children}
-    </Wrapper>
+    </Tag>
   )
 }

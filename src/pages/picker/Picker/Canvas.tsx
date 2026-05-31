@@ -16,7 +16,7 @@ export const Canvas: FC<{
   const { width, height, hue, gamut = 'srgb', className } = props
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const cbRef = useRef<number>()
+  const cbRef = useRef<number>(undefined)
 
   useEffect(() => {
     const previewWidth = 16
