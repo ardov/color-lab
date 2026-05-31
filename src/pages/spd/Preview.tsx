@@ -1,7 +1,7 @@
 import { clampChroma, Color, formatCss, oklch, p3, rgb, Xyz65 } from 'culori'
 import { toSrgb } from '@/shared/lib/huelab/gamut-mapping'
 import { oklchx } from './customModes/modeOklabx'
-import { clamp } from 'three/src/math/MathUtils'
+import { clamp } from 'three/src/math/MathUtils.js'
 import {
   lambdaToXyz,
   MAX_WAVELENGTH,
